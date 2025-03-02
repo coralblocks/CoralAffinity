@@ -11,6 +11,10 @@ import com.sun.jna.PointerType;
 
 public class CpuMaskScanner {
 	
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_RED = "\u001B[31m";
+    private static final String ANSI_BLUE = "\u001B[34m";
+	
 	private interface CLibrary extends Library {
 
 		public static final CLibrary INSTANCE = (CLibrary) Native.loadLibrary("c", CLibrary.class);
@@ -21,6 +25,14 @@ public class CpuMaskScanner {
 	public static class Result {
 		public int sizeInBytes;
 		public long defaultCpuMask;
+	}
+	
+	private static void printlnBlue(String s) {
+		System.out.println(ANSI_BLUE + s + ANSI_RESET);
+	}
+	
+	private static void printlnRed(String s) {
+		System.out.println(ANSI_RED + s + ANSI_RESET);
 	}
 	
 	public List<Result> scan(boolean debug) {
@@ -42,45 +54,43 @@ public class CpuMaskScanner {
 					result.sizeInBytes = p.getSizeInBytes();
 					result.defaultCpuMask = p.getValue();
 					results.add(result);
-					if (debug) System.out.println(" => SUCCESS: ret=" + ret + " defaultMask=" + result.defaultCpuMask);
+					if (debug) printlnBlue(" => SUCCESS: ret=" + ret + " defaultMask=" + result.defaultCpuMask);
 				} else {
-					if (debug) System.out.println(" => FAILURE: ret=" + ret);
+					if (debug) printlnRed(" => FAILURE: ret=" + ret);
 				}
 				
 				
 			} catch(Throwable t) {
-				if (debug) System.out.println(" => FAILURE: exception=\"" + t.getMessage() + "\"");
+				if (debug) printlnRed(" => FAILURE: exception=\"" + t.getMessage() + "\"");
 			}
 		}
-		
-		System.out.println();
 		
 		if (debug) {
 			int n = results.size();
 			if (n == 0) {
-				System.out.println("-----> Finished without finding any results!");
+				printlnRed("-----> Finished without finding any results!");
 			} else {
-				System.out.println("-----> Finished with " + n + " result" + (n > 1 ? "s!" : "!"));
+				printlnBlue("-----> Finished with " + n + " result" + (n > 1 ? "s!" : "!"));
 			}
 		}
 		
 		return results;
 	}
-	
+
 	public static void main(String[] args) {
 		
 		CpuMaskScanner scanner = new CpuMaskScanner();
 		List<Result> results = scanner.scan(true);
 		
-		System.out.println("\nResults:");
+		printlnBlue("\nResults:\n");
 		
 		if (results.isEmpty()) {
-			System.out.println("Could not find any cpu mask!");
+			printlnRed("Could not find any cpu mask!");
 			return;
 		}
 		
 		for(Result r : results) {
-			System.out.println("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
+			printlnBlue("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
 		}
 	}
 }
