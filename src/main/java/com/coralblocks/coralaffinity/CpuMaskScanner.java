@@ -13,7 +13,7 @@ public class CpuMaskScanner {
 	
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
-    private static final String ANSI_BLUE = "\u001B[34m";
+    private static final String ANSI_GREEN = "\u001B[32m";
 	
 	private interface CLibrary extends Library {
 
@@ -27,8 +27,8 @@ public class CpuMaskScanner {
 		public long defaultCpuMask;
 	}
 	
-	private static void printlnBlue(String s) {
-		System.out.println(ANSI_BLUE + s + ANSI_RESET);
+	private static void printGreen(String s) {
+		System.out.println(ANSI_GREEN + s + ANSI_RESET);
 	}
 	
 	private static void printlnRed(String s) {
@@ -54,7 +54,7 @@ public class CpuMaskScanner {
 					result.sizeInBytes = p.getSizeInBytes();
 					result.defaultCpuMask = p.getValue();
 					results.add(result);
-					if (debug) printlnBlue(" => SUCCESS: ret=" + ret + " defaultMask=" + result.defaultCpuMask);
+					if (debug) printGreen(" => SUCCESS: ret=" + ret + " defaultMask=" + result.defaultCpuMask);
 				} else {
 					if (debug) printlnRed(" => FAILURE: ret=" + ret);
 				}
@@ -70,7 +70,7 @@ public class CpuMaskScanner {
 			if (n == 0) {
 				printlnRed("-----> Finished without finding any results!");
 			} else {
-				printlnBlue("-----> Finished with " + n + " result" + (n > 1 ? "s!" : "!"));
+				printGreen("-----> Finished with " + n + " result" + (n > 1 ? "s!" : "!"));
 			}
 		}
 		
@@ -82,7 +82,7 @@ public class CpuMaskScanner {
 		CpuMaskScanner scanner = new CpuMaskScanner();
 		List<Result> results = scanner.scan(true);
 		
-		printlnBlue("\nResults:\n");
+		printGreen("\nResults:\n");
 		
 		if (results.isEmpty()) {
 			printlnRed("Could not find any cpu mask!");
@@ -90,7 +90,9 @@ public class CpuMaskScanner {
 		}
 		
 		for(Result r : results) {
-			printlnBlue("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
+			printGreen("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
 		}
+		
+		System.out.println();
 	}
 }
