@@ -20,6 +20,11 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		return sizeInBytes;
 	}
 	
+	@Override
+	public final int getSizeInBits() {
+		return sizeInBytes * 8;
+	}
+	
 	public static final List<Pointer> ALL = new ArrayList<Pointer>(32);
 	
 	static {
