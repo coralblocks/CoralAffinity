@@ -82,15 +82,17 @@ public class CpuMaskScanner {
 		CpuMaskScanner scanner = new CpuMaskScanner();
 		List<Result> results = scanner.scan(true);
 		
-		printGreen("\nResults:\n");
-		
 		if (results.isEmpty()) {
-			printlnRed("Could not find any cpu mask!");
-			return;
-		}
-		
-		for(Result r : results) {
-			printGreen("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
+			
+			printlnRed("\nCould not find any cpu mask!");
+			
+		} else {
+			
+			printGreen("\nRESULTS:\n");
+			
+			for(Result r : results) {
+				printGreen("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
+			}
 		}
 		
 		System.out.println();
