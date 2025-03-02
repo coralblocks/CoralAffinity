@@ -10,6 +10,15 @@ public class _32BitsPointer extends Pointer {
 	
 	public _32BitsPointer(int i) {
 		super(SIZE_IN_BYTES);
+		set(i);
+	}
+	
+	@Override
+	public void reset() {
+		set((int) 0);
+	}
+	
+	private void set(int i) {
 		getPointer().setInt(0, i);
 	}
 	

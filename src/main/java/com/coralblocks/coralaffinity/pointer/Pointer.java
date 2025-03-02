@@ -25,6 +25,8 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		return sizeInBytes * 8;
 	}
 	
+	public abstract void reset();
+	
 	public static final List<Pointer> ALL = new ArrayList<Pointer>(32);
 	
 	static {

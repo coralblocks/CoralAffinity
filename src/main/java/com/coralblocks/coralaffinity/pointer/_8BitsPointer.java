@@ -10,6 +10,15 @@ public class _8BitsPointer extends Pointer {
 	
 	public _8BitsPointer(byte b) {
 		super(SIZE_IN_BYTES);
+		set(b);
+	}
+	
+	@Override
+	public void reset() {
+		set((byte) 0);
+	}
+	
+	private void set(byte b) {
 		getPointer().setByte(0, b);
 	}
 	

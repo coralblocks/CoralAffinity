@@ -10,6 +10,15 @@ public class _144BitsPointer extends Pointer {
 	
 	public _144BitsPointer(long l1, long l2, short s) {
 		super(SIZE_IN_BYTES);
+		set(l1, l2, s);
+	}
+	
+	@Override
+	public void reset() {
+		set((long) 0, (long) 0, (short) 0);
+	}
+	
+	private void set(long l1, long l2, short s) {
 		getPointer().setLong(0, l1);
 		getPointer().setLong(8, l2);
 		getPointer().setShort(16, s);

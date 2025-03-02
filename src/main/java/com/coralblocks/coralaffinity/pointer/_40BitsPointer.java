@@ -10,6 +10,15 @@ public class _40BitsPointer extends Pointer {
 	
 	public _40BitsPointer(int i, byte b) {
 		super(SIZE_IN_BYTES);
+		set(i, b);
+	}
+	
+	@Override
+	public void reset() {
+		set((int) 0, (byte) 0);
+	}
+	
+	private void set(int i, byte b) {
 		getPointer().setInt(0, i);
 		getPointer().setByte(4, b);
 	}

@@ -10,6 +10,15 @@ public class _24BitsPointer extends Pointer {
 	
 	public _24BitsPointer(short s, byte b) {
 		super(SIZE_IN_BYTES);
+		set(s, b);
+	}
+	
+	@Override
+	public void reset() {
+		set((short) 0, (byte) 0);
+	}
+	
+	private void set(short s, byte b) {
 		getPointer().setShort(0, s);
 		getPointer().setByte(2, b);
 	}

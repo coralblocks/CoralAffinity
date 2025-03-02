@@ -10,6 +10,15 @@ public class _16BitsPointer extends Pointer {
 	
 	public _16BitsPointer(short s) {
 		super(SIZE_IN_BYTES);
+		set(s);
+	}
+	
+	@Override
+	public void reset() {
+		set((short) 0);
+	}
+	
+	private void set(short s) {
 		getPointer().setShort(0, s);
 	}
 	

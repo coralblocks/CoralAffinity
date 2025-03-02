@@ -10,6 +10,15 @@ public class _184BitsPointer extends Pointer {
 	
 	public _184BitsPointer(long l1, long l2, int i, short s, byte b) {
 		super(SIZE_IN_BYTES);
+		set(l1, l2, i, s, b);
+	}
+	
+	@Override
+	public void reset() {
+		set((long) 0, (long) 0, (int) 0, (short) 0, (byte) 0);
+	}
+	
+	private void set(long l1, long l2, int i, short s, byte b) {
 		getPointer().setLong(0, l1);
 		getPointer().setLong(8, l2);
 		getPointer().setInt(16, i);

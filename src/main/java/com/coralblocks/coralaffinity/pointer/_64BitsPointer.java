@@ -10,6 +10,15 @@ public class _64BitsPointer extends Pointer {
 	
 	public _64BitsPointer(long l) {
 		super(SIZE_IN_BYTES);
+		set(l);
+	}
+	
+	@Override
+	public void reset() {
+		set((long) 0);
+	}
+	
+	private void set(long l) {
 		getPointer().setLong(0, l);
 	}
 	

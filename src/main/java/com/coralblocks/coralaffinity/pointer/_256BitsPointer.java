@@ -10,6 +10,15 @@ public class _256BitsPointer extends Pointer {
 	
 	public _256BitsPointer(long l1, long l2, long l3, long l4) {
 		super(SIZE_IN_BYTES);
+		set(l1, l2, l3, l4);
+	}
+	
+	@Override
+	public void reset() {
+		set((long) 0, (long) 0, (long) 0, (long) 0);
+	}
+	
+	private void set(long l1, long l2, long l3, long l4) {
 		getPointer().setLong(0, l1);
 		getPointer().setLong(8, l2);
 		getPointer().setLong(16, l3);

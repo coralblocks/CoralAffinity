@@ -10,6 +10,15 @@ public class _96BitsPointer extends Pointer {
 	
 	public _96BitsPointer(long l, int i) {
 		super(SIZE_IN_BYTES);
+		set(l, i);
+	}
+	
+	@Override
+	public void reset() {
+		set((long) 0, (int) 0);
+	}
+	
+	private void set(long l, int i) {
 		getPointer().setLong(0, l);
 		getPointer().setInt(8, i);
 	}
