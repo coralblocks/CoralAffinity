@@ -1,7 +1,11 @@
 package com.coralblocks.coralaffinity;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.coralblocks.coralaffinity.pointer.Pointer;
 import com.sun.jna.LastErrorException;
@@ -79,6 +83,59 @@ public class CpuMaskScanner {
 		return results;
 	}
 	
+	private static boolean allEqual(List<Result> results) {
+		
+		Long mask = null;
+		
+		for(Result r : results) {
+			if (mask == null) {
+				mask = r.defaultCpuMask;
+			} else if (mask.longValue() != r.defaultCpuMask) {
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	private static int getLogicalProcessors() {
+		BufferedReader reader = null;
+		Process process = null;
+	    try {
+	        process = Runtime.getRuntime().exec("grep -c ^processor /proc/cpuinfo");
+	        reader = new BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
+	        String line = reader.readLine();
+	        return Integer.parseInt(line.trim());
+	    } catch (Exception e) {
+	        return -1;
+	    } finally {
+	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
+	    	if (process != null) try { process.destroyForcibly(); } catch(Exception e) { throw new RuntimeException(e); }
+	    }
+	}
+	
+	private static String getIsolcpus() {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader("/proc/cmdline"));
+			String cmdline = reader.readLine();
+			
+			Pattern pattern = Pattern.compile("\\bisolcpus=[^\\s]+");
+	        Matcher matcher = pattern.matcher(cmdline);
+
+	        if (matcher.find()) {
+	        	return matcher.group();
+	        }
+
+	        return "isolcpus=NOT_DEFINED";
+	        
+		} catch(Exception e) {
+			return "isolcpus=ERROR";
+		} finally {
+			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
+		}
+	}
+	
 	public static void main(String[] args) {
 		
 		CpuMaskScanner scanner = new CpuMaskScanner();
@@ -90,7 +147,12 @@ public class CpuMaskScanner {
 			
 		} else {
 			
-			printGreen("\nRESULTS:\n");
+			int procs = getLogicalProcessors();
+			
+			printGreen("\nRESULTS: allEqual=" + allEqual(results) 
+						+ " numberOfProcessors=" + procs
+						+ " " + getIsolcpus()
+						+ "\n");
 			
 			for(Result r : results) {
 				printGreen("sizeInBytes: " + r.sizeInBytes
