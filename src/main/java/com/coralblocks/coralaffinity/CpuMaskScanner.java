@@ -76,6 +76,11 @@ public class CpuMaskScanner {
 		
 		return results;
 	}
+	
+	private static String to64BitBinaryString(long value) {
+	    String binary = Long.toBinaryString(value);  
+	    return String.format("%64s", binary).replace(' ', '0'); 
+	}
 
 	public static void main(String[] args) {
 		
@@ -91,7 +96,10 @@ public class CpuMaskScanner {
 			printGreen("\nRESULTS:\n");
 			
 			for(Result r : results) {
-				printGreen("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask);
+				printGreen("sizeInBytes: " + r.sizeInBytes
+						+ " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask
+						+ " (" + to64BitBinaryString(r.defaultCpuMask) + ")"
+						);
 			}
 		}
 		
