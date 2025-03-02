@@ -23,7 +23,7 @@ public class CpuMaskScanner {
 		public long defaultCpuMask;
 	}
 	
-	public List<Result> scan() {
+	public List<Result> scan(boolean debug) {
 		
 		final CLibrary lib = CLibrary.INSTANCE;
 		
@@ -31,13 +31,34 @@ public class CpuMaskScanner {
 		
 		for(Pointer p : Pointer.ALL) {
 			
-			int ret = lib.sched_getaffinity(0, p.getSizeInBytes(), p);
+			if (debug) System.out.println("-----> Trying " + p.getClass().getSimpleName());
 			
-			if (ret >= 0) {
-				Result result = new Result();
-				result.sizeInBytes = p.getSizeInBytes();
-				result.defaultCpuMask = p.getValue();
-				results.add(result);
+			try {
+			
+				int ret = lib.sched_getaffinity(0, p.getSizeInBytes(), p);
+				
+				if (ret >= 0) {
+					Result result = new Result();
+					result.sizeInBytes = p.getSizeInBytes();
+					result.defaultCpuMask = p.getValue();
+					results.add(result);
+					if (debug) System.out.println("-----> SUCCESS: ret=" + ret + " => " + result.defaultCpuMask);
+				} else {
+					if (debug) System.out.println("-----> FAILURE: ret=" + ret);
+				}
+				
+				
+			} catch(Throwable t) {
+				if (debug) System.out.println("-----> FAILURE: exception=\"" + t.getMessage() + "\"");
+			}
+		}
+		
+		if (debug) {
+			int n = results.size();
+			if (n == 0) {
+				System.out.println("-----> Finished without finding any results!");
+			} else {
+				System.out.println("-----> Finished with " + n + " result" + (n > 1 ? "s!" : "!"));
 			}
 		}
 		
@@ -47,7 +68,9 @@ public class CpuMaskScanner {
 	public static void main(String[] args) {
 		
 		CpuMaskScanner scanner = new CpuMaskScanner();
-		List<Result> results = scanner.scan();
+		List<Result> results = scanner.scan(true);
+		
+		System.out.println();
 		
 		if (results.isEmpty()) {
 			System.out.println("Could not find any cpu mask!");
@@ -55,7 +78,7 @@ public class CpuMaskScanner {
 		}
 		
 		for(Result r : results) {
-			System.out.println("sizeInBytes: " + r.sizeInBytes + " / defaultCpuMask: " + r.defaultCpuMask);
+			System.out.println("sizeInBytes: " + r.sizeInBytes + " (" + r.sizeInBytes * 8 + " bits) / defaultCpuMask: " + r.defaultCpuMask);
 		}
 	}
 }
