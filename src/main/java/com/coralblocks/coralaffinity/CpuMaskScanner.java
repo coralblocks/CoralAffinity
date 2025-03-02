@@ -54,7 +54,9 @@ public class CpuMaskScanner {
 					result.sizeInBytes = p.getSizeInBytes();
 					result.defaultCpuMask = p.getValue();
 					results.add(result);
-					if (debug) printGreen(" => SUCCESS: ret=" + ret + " defaultMask=" + result.defaultCpuMask);
+					if (debug) printGreen(" => SUCCESS: ret=" + ret 
+							+ " defaultMask=" + result.defaultCpuMask
+							+ " (" + Long.toBinaryString(result.defaultCpuMask) + ")");
 				} else {
 					if (debug) printlnRed(" => FAILURE: ret=" + ret);
 				}
@@ -77,11 +79,6 @@ public class CpuMaskScanner {
 		return results;
 	}
 	
-	private static String to64BitBinaryString(long value) {
-	    String binary = Long.toBinaryString(value);  
-	    return String.format("%64s", binary).replace(' ', '0'); 
-	}
-
 	public static void main(String[] args) {
 		
 		CpuMaskScanner scanner = new CpuMaskScanner();
@@ -98,8 +95,7 @@ public class CpuMaskScanner {
 			for(Result r : results) {
 				printGreen("sizeInBytes: " + r.sizeInBytes
 						+ " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask
-						+ " (" + to64BitBinaryString(r.defaultCpuMask) + ")"
-						);
+						+ " (" + Long.toBinaryString(r.defaultCpuMask) + ")");
 			}
 		}
 		
