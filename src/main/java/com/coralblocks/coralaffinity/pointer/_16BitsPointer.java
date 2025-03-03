@@ -23,7 +23,10 @@ public class _16BitsPointer extends Pointer {
 	}
 	
 	@Override
-	public final long getValue() {
-		return getPointer().getShort(0);
+	public final long[] getValue() {
+		long[] value = new long[4];
+		short s = getPointer().getShort(0);
+		value[0] = s & 0xFFFFL;
+		return value;
 	}
 }

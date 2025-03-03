@@ -23,7 +23,10 @@ public class _64BitsPointer extends Pointer {
 	}
 	
 	@Override
-	public final long getValue() {
-		return getPointer().getLong(0);
+	public final long[] getValue() {
+		long[] value = new long[4];
+		long l = getPointer().getLong(0);
+		value[0] = l;
+		return value;
 	}
 }

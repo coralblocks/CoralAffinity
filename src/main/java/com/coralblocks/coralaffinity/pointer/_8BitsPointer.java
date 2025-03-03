@@ -23,7 +23,10 @@ public class _8BitsPointer extends Pointer {
 	}
 	
 	@Override
-	public final long getValue() {
-		return getPointer().getByte(0);
+	public final long[] getValue() {
+		long[] value = new long[4];
+		byte b = getPointer().getByte(0);
+		value[0] = b & 0xFFL;
+		return value;
 	}
 }

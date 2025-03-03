@@ -6,6 +6,6 @@ public interface CpuMask {
 	
 	public int getSizeInBytes();
 	
-	public long getValue();
+	public long[] getValue();
 	
 }

@@ -28,7 +28,7 @@ public class CpuMaskScanner {
 	
 	public static class Result {
 		public int sizeInBytes;
-		public long defaultCpuMask;
+		public long[] defaultCpuMask;
 	}
 	
 	private static void printGreen(String s) {
@@ -37,6 +37,25 @@ public class CpuMaskScanner {
 	
 	private static void printlnRed(String s) {
 		System.out.println(ANSI_RED + s + ANSI_RESET);
+	}
+	
+	private static String toString(long[] value) {
+		StringBuilder sb = new StringBuilder();
+		for(long l : value) {
+			if (sb.length() > 0) sb.append("|");
+			sb.append(l);
+		}
+		return sb.toString();
+	}
+	
+	private static String toBinaryString(long[] value) {
+		StringBuilder sb = new StringBuilder();
+		for(long l : value) {
+			if (sb.length() > 0) sb.append("|");
+			if (l == 0) sb.append("0");
+			else sb.append(Long.toBinaryString(l));
+		}
+		return sb.toString();
 	}
 	
 	public List<Result> scan(boolean debug) {
@@ -59,8 +78,8 @@ public class CpuMaskScanner {
 					result.defaultCpuMask = p.getValue();
 					results.add(result);
 					if (debug) printGreen(" => SUCCESS: ret=" + ret 
-							+ " defaultMask=" + result.defaultCpuMask
-							+ " (" + Long.toBinaryString(result.defaultCpuMask) + ")");
+							+ " defaultMask=" + toString(result.defaultCpuMask)
+							+ " (" + toBinaryString(result.defaultCpuMask) + ")");
 				} else {
 					if (debug) printlnRed(" => FAILURE: ret=" + ret);
 				}
@@ -83,18 +102,23 @@ public class CpuMaskScanner {
 		return results;
 	}
 	
+	private static boolean equal(long[] a1, long[] a2) {
+		if (a1.length != a2.length) return false;
+		for(int i = 0; i < a1.length; i++) {
+			if (a1[i] != a2[i]) return false;
+		}
+		return true;
+	}
+	
 	private static boolean allEqual(List<Result> results) {
-		
-		Long mask = null;
-		
+		long[] array = null;
 		for(Result r : results) {
-			if (mask == null) {
-				mask = r.defaultCpuMask;
-			} else if (mask.longValue() != r.defaultCpuMask) {
+			if (array == null) {
+				array = r.defaultCpuMask;
+			} else if (!equal(array, r.defaultCpuMask)) {
 				return false;
 			}
 		}
-		
 		return true;
 	}
 	
@@ -156,8 +180,8 @@ public class CpuMaskScanner {
 			
 			for(Result r : results) {
 				printGreen("sizeInBytes: " + r.sizeInBytes
-						+ " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + r.defaultCpuMask
-						+ " (" + Long.toBinaryString(r.defaultCpuMask) + ")");
+						+ " (" + r.sizeInBytes * 8 + " bits) => defaultCpuMask: " + toString(r.defaultCpuMask)
+						+ " (" + toBinaryString(r.defaultCpuMask) + ")");
 			}
 		}
 		

@@ -25,7 +25,13 @@ public class _104BitsPointer extends Pointer {
 	}
 	
 	@Override
-	public long getValue() {
-		return getPointer().getLong(0);
+	public long[] getValue() {
+		long[] value = new long[4];
+		long l = getPointer().getLong(0);
+		int i = getPointer().getInt(8);
+		byte b = getPointer().getByte(12);
+		value[0] = l;
+		value[1] = (((long) b & 0xFFL) << 32) | (((long) i) & 0xFFFFFFFFL);
+		return value; 
 	}
 }

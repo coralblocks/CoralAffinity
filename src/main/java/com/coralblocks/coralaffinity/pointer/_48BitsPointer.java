@@ -24,7 +24,11 @@ public class _48BitsPointer extends Pointer {
 	}
 	
 	@Override
-	public final long getValue() {
-		return getPointer().getInt(0);
+	public final long[] getValue() {
+		long[] value = new long[4];
+		int i = getPointer().getInt(0);
+		short s = getPointer().getShort(4);
+		value[0] = (((long) s & 0xFFFFL) << 32) | (((long) i) & 0xFFFFFFFFL);
+		return value;
 	}
 }

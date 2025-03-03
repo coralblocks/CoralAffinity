@@ -24,7 +24,12 @@ public class _80BitsPointer extends Pointer {
 	}
 	
 	@Override
-	public final long getValue() {
-		return getPointer().getLong(0);
+	public final long[] getValue() {
+		long[] value = new long[4];
+		long l = getPointer().getLong(0);
+		short s = getPointer().getShort(8);
+		value[0] = l;
+		value[1] = s & 0xFFFFL;
+		return value;
 	}
 }
