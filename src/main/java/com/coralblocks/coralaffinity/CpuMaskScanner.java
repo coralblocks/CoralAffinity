@@ -21,7 +21,7 @@ public class CpuMaskScanner {
 	
 	private interface CLibrary extends Library {
 
-		public static final CLibrary INSTANCE = (CLibrary) Native.loadLibrary("c", CLibrary.class);
+		public static final CLibrary INSTANCE = (CLibrary) Native.load("c", CLibrary.class);
 		
 		public int sched_getaffinity(final int pid, final int cpusetsize, final PointerType cpuset) throws LastErrorException;
 	}
