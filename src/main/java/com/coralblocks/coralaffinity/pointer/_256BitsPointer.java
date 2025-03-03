@@ -35,7 +35,7 @@ public class _256BitsPointer extends Pointer {
 		value[0] = l1;
 		value[1] = l2;
 		value[2] = l3;
-		value[4] = l4;
+		value[3] = l4;
 		return value;
 	}
 }
