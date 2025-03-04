@@ -213,12 +213,28 @@ public class CpuInfo {
         
         return result;
 	}
+	
+	private static long getOneMask(int sizeInBits) {
+	    if (sizeInBits < 1 || sizeInBits > 64) {
+	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
+	    }
+	    
+	    // Special case for 64: all bits set, which is -1 in two's complement
+	    if (sizeInBits == 64) {
+	        return -1L;
+	    }
+	    // Otherwise, shift 1L left sizeInBits and subtract 1 to get sizeInBits 1s
+	    return (1L << sizeInBits) - 1;
+	}
 
-	public static long getBitmask(int[] bitsToSetToZero) {
-        long result = 0xFFFFFFFFFFFFFFFFL; // Initialize lower 16 bits to 1
+	public static long getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
+		
+        long result = getOneMask(numberOfProcessors);
+
         for (int num : bitsToSetToZero) {
             result &= ~(1L << num); // Clear the bit at position 'num'
         }
+        
         return result;
 	}
 	
@@ -354,12 +370,12 @@ public class CpuInfo {
 			
 		} else {
 			
-			int procs = getLogicalProcessors();
+			int procs = getNumberOfProcessors();
 			int[] isolcpus = getIsolCpus();
 			
 			String ic = "NOT_DEFINED";
 			if (isolcpus.length != 0) {
-				ic = arrayToString(isolcpus) + "-(" + getBitmask(isolcpus) + ")";
+				ic = arrayToString(isolcpus) + "=(" + getBitmask(isolcpus, procs) + ")";
 			}
 			
 			printGreen("RESULTS: allEqual=" + allEqual(results) 
