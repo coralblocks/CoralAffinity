@@ -238,16 +238,16 @@ public class CpuInfo {
 					result.defaultCpuMask = p.getValue();
 					result.sizeInBits = p.getSizeInBytes() * 8;
 					results.add(result);
-					if (verbose) printGreen(VERBOSE_PREFIX + "SUCCESS: ret=" + ret 
+					if (verbose) printGreen(" ---> SUCCESS: ret=" + ret 
 							+ " defaultMask=" + toString(result.defaultCpuMask)
 							+ " (" + toBinaryString(result.defaultCpuMask) + ")");
 				} else {
-					if (verbose) printlnRed(VERBOSE_PREFIX + "FAILURE: ret=" + ret);
+					if (verbose) printlnRed(" ---> FAILURE: ret=" + ret);
 				}
 				
 				
 			} catch(Throwable t) {
-				if (verbose) printlnRed(VERBOSE_PREFIX + "FAILURE: exception=\"" + t.getMessage() + "\"");
+				if (verbose) printlnRed(" ---> FAILURE: exception=\"" + t.getMessage() + "\"");
 			}
 		}
 		
