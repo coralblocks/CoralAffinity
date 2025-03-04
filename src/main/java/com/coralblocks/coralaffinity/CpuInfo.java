@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -215,6 +214,13 @@ public class CpuInfo {
         return result;
 	}
 
+	public static long getBitmask(int[] numbers) {
+	    long mask = 0L;
+	    for (int n : numbers) {
+	         mask |= (1L << n);
+	    }
+	    return mask;
+	}
 	
 	private static Result[] scan(boolean verbose) {
 		
@@ -351,9 +357,14 @@ public class CpuInfo {
 			int procs = getLogicalProcessors();
 			int[] isolcpus = getIsolCpus();
 			
+			String ic = "NOT_DEFINED";
+			if (isolcpus.length != 0) {
+				ic = arrayToString(isolcpus) + "-(" + getBitmask(isolcpus) + ")";
+			}
+			
 			printGreen("RESULTS: allEqual=" + allEqual(results) 
 						+ " numberOfProcessors=" + procs
-						+ " isolcpus=" + (isolcpus.length != 0 ? arrayToString(isolcpus) : "NOT_DEFINED")
+						+ " isolcpus=" + ic
 						+ "\n");
 			
 			for(Result r : results) {
