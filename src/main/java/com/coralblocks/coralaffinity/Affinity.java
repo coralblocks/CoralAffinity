@@ -7,6 +7,10 @@ import com.sun.jna.PointerType;
 
 public class Affinity {
 	
+	private Affinity() {
+		
+	}
+	
 	static interface CLibrary extends Library {
 
 		public static final CLibrary INSTANCE = (CLibrary) Native.load("c", CLibrary.class);
