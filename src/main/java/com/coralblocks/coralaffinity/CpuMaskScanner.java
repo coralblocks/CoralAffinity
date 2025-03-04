@@ -7,24 +7,14 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.coralblocks.coralaffinity.Affinity.CLibrary;
 import com.coralblocks.coralaffinity.pointer.Pointer;
-import com.sun.jna.LastErrorException;
-import com.sun.jna.Library;
-import com.sun.jna.Native;
-import com.sun.jna.PointerType;
 
 public class CpuMaskScanner {
 	
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_GREEN = "\u001B[32m";
-	
-	private interface CLibrary extends Library {
-
-		public static final CLibrary INSTANCE = (CLibrary) Native.load("c", CLibrary.class);
-		
-		public int sched_getaffinity(final int pid, final int cpusetsize, final PointerType cpuset) throws LastErrorException;
-	}
 	
 	public static class Result {
 		public int sizeInBytes;
@@ -60,7 +50,7 @@ public class CpuMaskScanner {
 	
 	public List<Result> scan(boolean debug) {
 		
-		final CLibrary lib = CLibrary.INSTANCE;
+		final CLibrary lib = Affinity.getLib();
 		
 		List<Result> results = new ArrayList<Result>(Pointer.ALL.size());
 		
