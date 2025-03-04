@@ -214,12 +214,12 @@ public class CpuInfo {
         return result;
 	}
 
-	public static long getBitmask(int[] numbers) {
-	    long mask = 0L;
-	    for (int n : numbers) {
-	         mask |= (1L << n);
-	    }
-	    return mask;
+	public static long getBitmask(int[] bitsToSetToZero) {
+        long result = 0xFFFFFFFFFFFFFFFFL; // Initialize lower 16 bits to 1
+        for (int num : bitsToSetToZero) {
+            result &= ~(1L << num); // Clear the bit at position 'num'
+        }
+        return result;
 	}
 	
 	private static Result[] scan(boolean verbose) {
