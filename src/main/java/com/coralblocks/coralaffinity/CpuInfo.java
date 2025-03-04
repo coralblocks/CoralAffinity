@@ -319,12 +319,12 @@ public class CpuInfo {
 		
 		boolean available = CpuInfo.init(verbose);
 		
-		System.out.println();
-		
 		if (!available) {
-			printlnRed("CoralAffinity is not available!");
+			printlnRed("\nCoralAffinity is not available!\n");
 			return;
 		}
+		
+		System.out.println();
 		
 		Result[] results = getResults();
 		
