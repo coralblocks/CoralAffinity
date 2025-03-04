@@ -10,7 +10,7 @@ import java.util.regex.Pattern;
 import com.coralblocks.coralaffinity.Affinity.CLibrary;
 import com.coralblocks.coralaffinity.pointer.Pointer;
 
-public class CpuMaskScanner {
+public class CpuInfo {
 	
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
@@ -19,6 +19,10 @@ public class CpuMaskScanner {
 	public static class Result {
 		public int sizeInBytes;
 		public long[] defaultCpuMask;
+	}
+	
+	private CpuInfo() {
+		
 	}
 	
 	private static void printGreen(String s) {
@@ -48,7 +52,7 @@ public class CpuMaskScanner {
 		return sb.toString();
 	}
 	
-	public List<Result> scan(boolean debug) {
+	public static List<Result> scan(boolean debug) {
 		
 		final CLibrary lib = Affinity.getLib();
 		
@@ -152,8 +156,7 @@ public class CpuMaskScanner {
 	
 	public static void main(String[] args) {
 		
-		CpuMaskScanner scanner = new CpuMaskScanner();
-		List<Result> results = scanner.scan(true);
+		List<Result> results = CpuInfo.scan(true);
 		
 		if (results.isEmpty()) {
 			
