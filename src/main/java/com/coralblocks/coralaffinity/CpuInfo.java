@@ -66,7 +66,7 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors);
 			
 			isolcpus = getIsolcpusNumbers(readProcCmdline());
-			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? Arrays.toString(isolcpus) : "NOT_DEFINED"));
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? arrayToString(isolcpus) : "NOT_DEFINED"));
 			
 			results = scan(verbose);
 		}
@@ -264,6 +264,20 @@ public class CpuInfo {
 		return results.toArray(array);
 	}
 	
+	public static String arrayToString(int[] arr) {
+	    if (arr == null || arr.length == 0) {
+	        return "";
+	    }
+	    StringBuilder sb = new StringBuilder();
+	    for (int i = 0; i < arr.length; i++) {
+	        sb.append(arr[i]);
+	        if (i < arr.length - 1) {
+	            sb.append(",");
+	        }
+	    }
+	    return sb.toString();
+	}
+	
 	private static void printGreen(String s) {
 		System.out.println(ANSI_GREEN + s + ANSI_RESET);
 	}
@@ -339,7 +353,7 @@ public class CpuInfo {
 			
 			printGreen("RESULTS: allEqual=" + allEqual(results) 
 						+ " numberOfProcessors=" + procs
-						+ " isolcpus=" + (isolcpus.length != 0 ? Arrays.toString(isolcpus) : "NOT_DEFINED")
+						+ " isolcpus=" + (isolcpus.length != 0 ? arrayToString(isolcpus) : "NOT_DEFINED")
 						+ "\n");
 			
 			for(Result r : results) {
