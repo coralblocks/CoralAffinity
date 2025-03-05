@@ -334,10 +334,12 @@ public class CpuInfo {
 	private static Boolean isHyperthreadingOn(boolean verbose) {
 		
 		if (verbose) System.out.println(VERBOSE_PREFIX + "Will check for hyperthreading...");
+		
+		Process process = null;
 
 		try {
 
-			Process process = new ProcessBuilder("lscpu").start();
+			process = new ProcessBuilder("lscpu").start();
 
 			int exitCode = process.waitFor();
 
@@ -384,11 +386,15 @@ public class CpuInfo {
 			} catch (Exception e) {
 				if (verbose) System.out.println(VERBOSE_PREFIX + "Exception: " + e.getMessage());
 				return null;
+			} finally {
+				if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 			}
 
 		} catch (Exception e) {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Exception: " + e.getMessage());
 			return null;
+		} finally {
+			if (process != null) try { process.destroyForcibly(); } catch(Exception e) { throw new RuntimeException(e); }
 		}
 	}
 	
