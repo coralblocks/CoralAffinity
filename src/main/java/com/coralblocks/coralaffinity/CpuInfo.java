@@ -32,6 +32,7 @@ public class CpuInfo {
 	private static int[] isolcpus = null;
 	private static Result[] results = null;
 	private static Result chosenResult = null;
+	private static Boolean areResultsEqual = null;
 	
 	static {
 		final String isEnabledConfig = "coralAffinityEnabled";
@@ -71,6 +72,9 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? arrayToString(isolcpus) : "NOT_DEFINED"));
 			
 			results = scan(verbose);
+			
+			areResultsEqual = allEqual(results);
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Results equals: " + areResultsEqual);
 			
 			for(Result result : results) {
 				if (numberOfProcessors <= result.sizeInBits) {
