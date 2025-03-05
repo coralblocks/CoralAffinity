@@ -245,8 +245,6 @@ public class CpuInfo {
 	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
 	    }
 	    
-	    if (bitmask == 0) return new int[0];
-
 	    List<Integer> clearedPositions = new ArrayList<>();
 
 	    for (int i = 0; i < sizeInBits; i++) {
