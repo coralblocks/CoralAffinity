@@ -263,28 +263,38 @@ public class CpuInfo {
 	    return result;
 	}
 	
-	public static int[] getProcsFromBitmask(long bitmask) {
+	public static int[] getProcsFromBitmask(long bitmask, int numberOfProcessors) {
 		long[] array = new long[1];
 		array[0] = bitmask;
-		return getProcsFromBitmask(array);
+		return getProcsFromBitmask(array, numberOfProcessors);
 	}
 	
-	public static int[] getProcsFromBitmask(long[] bitmask) {
+	public static int[] getProcsFromBitmask(long[] bitmask, int numberOfProcessors) {
 		
 		List<Integer> list = new ArrayList<Integer>(256);
+		
+		int remainingBits = numberOfProcessors;
 
 		for(int i = 0; i < bitmask.length; i++) {
 			
 			long _64bitmask = bitmask[i];
+			
+			int sizeInBits;
+			if (remainingBits - 64 >= 0) {
+				sizeInBits = 64;
+			} else {
+				sizeInBits = remainingBits;
+			}
+			
+			int[] procs = getClearedBitPositions(_64bitmask, sizeInBits);
+			
 			int toAdd = i * 64;
-			
-			if (_64bitmask == 0) continue;
-			
-			int[] procs = getClearedBitPositions(_64bitmask, 64);
-			
 			for(int proc : procs) {
 				list.add(proc + toAdd);
 			}
+
+			remainingBits -= 64;
+			if (remainingBits <= 0) break;
 		}
 		
 		int[] toReturn = new int[list.size()];
@@ -444,7 +454,7 @@ public class CpuInfo {
 				printGreen("sizeInBytes: " + r.sizeInBytes
 						+ " (" + r.sizeInBits + " bits) => defaultCpuMask: " + toString(r.defaultCpuMask)
 						+ " (" + toBinaryString(r.defaultCpuMask) + ")"
-						+ " procs=" + arrayToString(getProcsFromBitmask(r.defaultCpuMask)));
+						+ " procs=" + arrayToString(getProcsFromBitmask(r.defaultCpuMask, numberOfProcessors)));
 			}
 		}
 		
