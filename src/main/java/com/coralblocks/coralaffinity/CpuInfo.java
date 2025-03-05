@@ -544,9 +544,9 @@ public class CpuInfo {
 	
 	public static void main(String[] args) {
 		
-		boolean verbose = true;
+		final boolean verbose = args.length > 0 ? Boolean.parseBoolean(args[0]) : true;
 		
-		if (args.length > 0) verbose = Boolean.parseBoolean(args[0]);
+		if (verbose) System.out.println();
 		
 		boolean available = CpuInfo.init(verbose);
 		
