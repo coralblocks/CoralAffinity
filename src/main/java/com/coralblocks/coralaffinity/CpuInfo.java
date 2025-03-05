@@ -444,7 +444,7 @@ public class CpuInfo {
 				printGreen("sizeInBytes: " + r.sizeInBytes
 						+ " (" + r.sizeInBits + " bits) => defaultCpuMask: " + toString(r.defaultCpuMask)
 						+ " (" + toBinaryString(r.defaultCpuMask) + ")"
-						+ " procs=" + getProcsFromBitmask(r.defaultCpuMask));
+						+ " procs=" + arrayToString(getProcsFromBitmask(r.defaultCpuMask)));
 			}
 		}
 		
