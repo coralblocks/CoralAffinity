@@ -74,7 +74,7 @@ public class CpuInfo {
 			bitmasks = scan(verbose);
 			
 			areBitmasksEqual = allEqual(bitmasks);
-			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmasks equals: " + areBitmasksEqual);
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmasks are equal: " + areBitmasksEqual);
 			
 			for(Bitmask bm : bitmasks) {
 				if (numberOfProcessors <= bm.sizeInBits) {
@@ -122,7 +122,17 @@ public class CpuInfo {
 		System.out.println("isInitialized: " + isInitialized);
 		System.out.println("isEnabled: " + isEnabled);
 		System.out.println("isAvailable: " + isAvailable);
-		System.out.println("numberOfProcessors: " + (numberOfProcessors == -1 ? "NOT_AVAILABLE" : numberOfProcessors));
+
+		String n;
+		if (numberOfProcessors <= 0) {
+			n = "NOT_AVAILABLE";
+		} else if (numberOfProcessors == 1) {
+			n = "1 (0)";
+		} else {
+			n = String.valueOf(numberOfProcessors) + " (0-" + (numberOfProcessors - 1) + ")";
+		}
+		
+		System.out.println("numberOfProcessors: " + n);
 		
 		String ic;
 		if (isolcpus == null) {
