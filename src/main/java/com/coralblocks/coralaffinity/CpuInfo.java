@@ -64,6 +64,8 @@ public class CpuInfo {
 			numberOfProcessors = getLogicalProcessors();
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors);
 			
+			if (numberOfProcessors <= 0) throw new RuntimeException("Got an invalid number of processors: " + numberOfProcessors);
+			
 			isolcpus = getIsolcpusNumbers(readProcCmdline());
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? arrayToString(isolcpus) : "NOT_DEFINED"));
 			
@@ -156,7 +158,7 @@ public class CpuInfo {
 	        String line = reader.readLine();
 	        return Integer.parseInt(line.trim());
 	    } catch (Exception e) {
-	        return -1;
+	        throw new RuntimeException("Cannot read number of processors from /proc/cpuinfo!", e);
 	    } finally {
 	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 	    	if (process != null) try { process.destroyForcibly(); } catch(Exception e) { throw new RuntimeException(e); }
@@ -220,23 +222,42 @@ public class CpuInfo {
 	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
 	    }
 	    
-	    // Special case for 64: all bits set, which is -1 in two's complement
 	    if (sizeInBits == 64) {
 	        return -1L;
 	    }
-	    // Otherwise, shift 1L left sizeInBits and subtract 1 to get sizeInBits 1s
+	    
 	    return (1L << sizeInBits) - 1;
 	}
 
-	public static long getBitmask(int[] bitsToSetToZero, int sizeInBits) {
+	public static long[] getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
 		
-        long result = getOneBitmask(sizeInBits);
+		int remainingBits = numberOfProcessors;
+		
+		int numberOfLongs = (numberOfProcessors - 1) / 64 + 1;
+		
+		long[] bitmask = new long[numberOfLongs];
+		
+		for(int i = 0; i < bitmask.length; i++) {
+			
+			int sizeInBits;
+			if (remainingBits - 64 >= 0) {
+				sizeInBits = 64;
+			} else {
+				sizeInBits = remainingBits;
+			}
+			
+			remainingBits -= 64;
+			
+	        long result = getOneBitmask(sizeInBits);
 
-        for (int num : bitsToSetToZero) {
-            result &= ~(1L << num); // Clear the bit at position 'num'
-        }
+	        for (int num : bitsToSetToZero) {
+	            result &= ~(1L << num); // Clear the bit at position 'num'
+	        }
+	        
+	        bitmask[i] = result;
+		}
         
-        return result;
+        return bitmask;
 	}
 	
 	private static int[] getClearedBitPositions(long bitmask, int sizeInBits) {
@@ -440,7 +461,7 @@ public class CpuInfo {
 			
 			String ic = "NOT_DEFINED";
 			if (isolcpus.length != 0) {
-				ic = arrayToString(isolcpus) + "=(" + getBitmask(isolcpus, procs) + ")";
+				ic = arrayToString(isolcpus) + "=(" + toString(getBitmask(isolcpus, procs)) + ")";
 			}
 			
 			printGreen("RESULTS: allEqual=" + allEqual(results) 
