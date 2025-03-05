@@ -117,6 +117,49 @@ public class CpuInfo {
 		return isAvailable;
 	}
 	
+	public static void printInfo() {
+		
+		System.out.println("isInitialized: " + isInitialized);
+		System.out.println("isEnabled: " + isEnabled);
+		System.out.println("isAvailable: " + isAvailable);
+		System.out.println("numberOfProcessors: " + (numberOfProcessors == -1 ? "NOT_AVAILABLE" : numberOfProcessors));
+		
+		String ic;
+		if (isolcpus == null) {
+			ic = "NOT_AVAILABLE";
+		} else if (isolcpus.length == 0) {
+			ic = "NOT_DEFINED";
+		} else {
+			long[] bitmask = getBitmask(isolcpus, numberOfProcessors);
+			ic = arrayToString(isolcpus) + "=(" + toString(bitmask) + "-" + toBinaryString(bitmask) + ")";
+		}
+		
+		System.out.println("isolcpus: " + ic);
+		
+		String r;
+		if (results == null) {
+			r = "NOT_AVAILABLE";
+		} else {
+			r = String.valueOf(results.length);
+		}
+		
+		System.out.println("results: " + r);
+		
+		System.out.println("areResultsEqual: " + (areResultsEqual == null ? false : areResultsEqual.booleanValue()));
+		
+		String c;
+		if (chosenResult == null) {
+			c = "NOT_AVAILABLE";
+		} else {
+			c = "sizeInBytes=" + chosenResult.sizeInBytes
+					+ " sizeInBits=" + chosenResult.sizeInBits + " defaultCpuMask=" + toString(chosenResult.defaultCpuMask)
+					+ "-(" + toBinaryString(chosenResult.defaultCpuMask) + ") "
+					+ " procs=" + arrayToString(getProcsFromBitmask(chosenResult.defaultCpuMask, numberOfProcessors));
+		}
+		
+		System.out.println("chosenResult: " + c);
+	}
+	
 	private static String getSizeInBits(Result[] results) {
 		StringBuilder sb = new StringBuilder();
 		for(Result result : results) {
@@ -129,12 +172,6 @@ public class CpuInfo {
 	private synchronized static boolean isAvailable(boolean verbose) {
 		
 		if (isAvailable == null) {
-			
-			if (!isEnabled) {
-				if (verbose) System.out.println(VERBOSE_PREFIX + "CoralAffinity is disabled!");
-				isAvailable = false;
-				return false;
-			}
 			
 			String OS = System.getProperty("os.name").toLowerCase();
 			boolean isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
@@ -244,7 +281,7 @@ public class CpuInfo {
         Matcher matcher = pattern.matcher(cmdline);
 
         if (!matcher.find()) {
-            return null;
+            return new int[0];
         }
         
         String value = matcher.group(1);
@@ -504,7 +541,10 @@ public class CpuInfo {
 		boolean available = CpuInfo.init(verbose);
 		
 		if (!available) {
-			printlnRed("\nCoralAffinity is not available!\n");
+			printlnRed("\nCoralAffinity is not available!");
+			System.out.println();
+			CpuInfo.printInfo();
+			System.out.println();
 			return;
 		}
 		
@@ -539,6 +579,10 @@ public class CpuInfo {
 						+ " procs=" + arrayToString(getProcsFromBitmask(r.defaultCpuMask, numberOfProcessors)));
 			}
 		}
+		
+		System.out.println();
+		
+		CpuInfo.printInfo();
 		
 		System.out.println();
 	}
