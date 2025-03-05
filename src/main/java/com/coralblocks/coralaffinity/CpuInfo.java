@@ -153,7 +153,7 @@ public class CpuInfo {
 			r = String.valueOf(bitmasks.length);
 		}
 		
-		System.out.println("bitmasks: " + r);
+		System.out.println("bitmasksFound: " + r);
 		
 		System.out.println("areBitmasksEqual: " + (areBitmasksEqual == null ? false : areBitmasksEqual.booleanValue()));
 		
