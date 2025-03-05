@@ -198,6 +198,17 @@ public class CpuInfo {
 		return results;
 	}
 	
+	public static Result getChosenResult() {
+		return chosenResult;
+	}
+	
+	public static boolean areResultsEqual() {
+		if (areResultsEqual != null) {
+			return areResultsEqual.booleanValue();
+		}
+		return false;
+	}
+	
 	private static int getLogicalProcessors() {
 		BufferedReader reader = null;
 		Process process = null;
