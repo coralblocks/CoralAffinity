@@ -548,47 +548,7 @@ public class CpuInfo {
 		
 		if (verbose) System.out.println();
 		
-		boolean available = CpuInfo.init(verbose);
-		
-		if (!available) {
-			printlnRed("\nCoralAffinity is not available!");
-			System.out.println();
-			CpuInfo.printInfo();
-			System.out.println();
-			return;
-		}
-		
-		System.out.println();
-		
-		Bitmask[] bitmasks = getBitmasks();
-		
-		if (bitmasks.length == 0) {
-			
-			printlnRed("Could not find any cpu mask!");
-			
-		} else {
-			
-			int procs = getNumberOfProcessors();
-			int[] isolcpus = getIsolCpus();
-			
-			String ic = "NOT_DEFINED";
-			if (isolcpus.length != 0) {
-				long[] bitmask = getBitmask(isolcpus, procs);
-				ic = arrayToString(isolcpus) + "-(" + toString(bitmask) + "-" + toBinaryString(bitmask) + ")";
-			}
-			
-			printlnGreen("BITMASKS: allEqual=" + allEqual(bitmasks) 
-						+ " numberOfProcessors=" + procs
-						+ " isolcpus=" + ic
-						+ "\n");
-			
-			for(Bitmask r : bitmasks) {
-				printlnGreen("sizeInBytes: " + r.sizeInBytes
-						+ " (" + r.sizeInBits + " bits) => defaultCpuMask: " + toString(r.defaultCpuMask)
-						+ " (" + toBinaryString(r.defaultCpuMask) + ")"
-						+ " procs=" + arrayToString(getProcsFromBitmask(r.defaultCpuMask, numberOfProcessors)));
-			}
-		}
+		CpuInfo.init(verbose);
 		
 		System.out.println();
 		
