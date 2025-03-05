@@ -3,7 +3,6 @@ package com.coralblocks.coralaffinity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -260,6 +259,13 @@ public class CpuInfo {
 	public static boolean areBitmasksEqual() {
 		if (areBitmasksEqual != null) {
 			return areBitmasksEqual.booleanValue();
+		}
+		return false;
+	}
+	
+	public static boolean isHyperthreadingOn() {
+		if (isHyperthreadingOn != null) {
+			return isHyperthreadingOn.booleanValue();
 		}
 		return false;
 	}
