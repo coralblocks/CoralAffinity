@@ -3,6 +3,8 @@ package com.coralblocks.coralaffinity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +35,7 @@ public class CpuInfo {
 	private static Bitmask[] bitmasks = null;
 	private static Bitmask chosenBitmask = null;
 	private static Boolean areBitmasksEqual = null;
+	private static Boolean isHyperthreadingOn = null;
 	
 	static {
 		final String isEnabledConfig = "coralAffinityEnabled";
@@ -67,6 +70,9 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors);
 			
 			if (numberOfProcessors <= 0) throw new RuntimeException("Got an invalid number of processors: " + numberOfProcessors);
+			
+			isHyperthreadingOn = isHyperthreadingOn(verbose);
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Is hyperthreading on: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 			
 			isolcpus = getIsolcpusNumbers(readProcCmdline());
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? arrayToString(isolcpus) : "NOT_DEFINED"));
@@ -133,6 +139,8 @@ public class CpuInfo {
 		}
 		
 		System.out.println("numberOfProcessors: " + n);
+		
+		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 		
 		String ic;
 		if (isolcpus == null) {
@@ -321,6 +329,67 @@ public class CpuInfo {
         }
         
         return toReturn;
+	}
+	
+	private static Boolean isHyperthreadingOn(boolean verbose) {
+		
+		if (verbose) System.out.println(VERBOSE_PREFIX + "Will check for hyperthreading...");
+
+		try {
+
+			Process process = new ProcessBuilder("lscpu").start();
+
+			int exitCode = process.waitFor();
+
+			if (exitCode != 0) {
+				if (verbose) System.out.println(VERBOSE_PREFIX + "lscpu returned bad exit code: " + exitCode);
+				return null;
+			}
+
+			BufferedReader reader = null;
+
+			try {
+
+				reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+
+				String line;
+
+				while ((line = reader.readLine()) != null) {
+					
+					if (line.trim().startsWith("Thread(s) per core:")) {
+						
+						String[] parts = line.split(":\\s+");
+						
+						if (parts.length == 2) {
+							
+							int threadsPerCore = Integer.parseInt(parts[1].trim());
+							
+							if (verbose) System.out.println(VERBOSE_PREFIX + "Threads per core: " + threadsPerCore);
+							
+							return threadsPerCore > 1;
+							
+						} else {
+							
+							if (verbose) System.out.println(VERBOSE_PREFIX + "Bad line: " + line);
+							
+							return null;
+						}
+					}
+				}
+				
+				if (verbose) System.out.println(VERBOSE_PREFIX + "Could not find Threads per core!");
+				
+				return null;
+				
+			} catch (Exception e) {
+				if (verbose) System.out.println(VERBOSE_PREFIX + "Exception: " + e.getMessage());
+				return null;
+			}
+
+		} catch (Exception e) {
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Exception: " + e.getMessage());
+			return null;
+		}
 	}
 	
 	private static long getOneBitmask(int sizeInBits) {

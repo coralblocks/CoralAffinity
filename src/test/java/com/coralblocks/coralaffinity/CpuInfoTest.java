@@ -5,7 +5,4 @@ import static org.junit.Assert.*;
 
 public class CpuInfoTest {
 	
-	static {
-		CpuInfo.init();
-	}
 }
