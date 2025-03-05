@@ -214,7 +214,8 @@ public class CpuInfo {
         return result;
 	}
 	
-	private static long getOneMask(int sizeInBits) {
+	private static long getOneBitmask(int sizeInBits) {
+		
 	    if (sizeInBits < 1 || sizeInBits > 64) {
 	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
 	    }
@@ -227,15 +228,71 @@ public class CpuInfo {
 	    return (1L << sizeInBits) - 1;
 	}
 
-	public static long getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
+	public static long getBitmask(int[] bitsToSetToZero, int sizeInBits) {
 		
-        long result = getOneMask(numberOfProcessors);
+        long result = getOneBitmask(sizeInBits);
 
         for (int num : bitsToSetToZero) {
             result &= ~(1L << num); // Clear the bit at position 'num'
         }
         
         return result;
+	}
+	
+	private static int[] getClearedBitPositions(long bitmask, int sizeInBits) {
+		
+	    if (sizeInBits < 1 || sizeInBits > 64) {
+	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
+	    }
+	    
+	    if (bitmask == 0) return new int[0];
+
+	    List<Integer> clearedPositions = new ArrayList<>();
+
+	    for (int i = 0; i < sizeInBits; i++) {
+	        if ((bitmask & (1L << i)) == 0) {
+	            clearedPositions.add(i);
+	        }
+	    }
+
+	    int[] result = new int[clearedPositions.size()];
+	    for (int i = 0; i < clearedPositions.size(); i++) {
+	        result[i] = clearedPositions.get(i);
+	    }
+
+	    return result;
+	}
+	
+	public static int[] getProcsFromBitmask(long bitmask) {
+		long[] array = new long[1];
+		array[0] = bitmask;
+		return getProcsFromBitmask(array);
+	}
+	
+	public static int[] getProcsFromBitmask(long[] bitmask) {
+		
+		List<Integer> list = new ArrayList<Integer>(256);
+
+		for(int i = 0; i < bitmask.length; i++) {
+			
+			long _64bitmask = bitmask[i];
+			int toAdd = i * 64;
+			
+			if (_64bitmask == 0) continue;
+			
+			int[] procs = getClearedBitPositions(_64bitmask, 64);
+			
+			for(int proc : procs) {
+				list.add(proc + toAdd);
+			}
+		}
+		
+		int[] toReturn = new int[list.size()];
+		for(int i = 0; i < list.size(); i++) {
+			toReturn[i] = list.get(i).intValue();
+		}
+		
+		return toReturn;
 	}
 	
 	private static Result[] scan(boolean verbose) {
@@ -386,7 +443,8 @@ public class CpuInfo {
 			for(Result r : results) {
 				printGreen("sizeInBytes: " + r.sizeInBytes
 						+ " (" + r.sizeInBits + " bits) => defaultCpuMask: " + toString(r.defaultCpuMask)
-						+ " (" + toBinaryString(r.defaultCpuMask) + ")");
+						+ " (" + toBinaryString(r.defaultCpuMask) + ")"
+						+ " procs=" + getProcsFromBitmask(r.defaultCpuMask));
 			}
 		}
 		
