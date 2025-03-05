@@ -73,7 +73,7 @@ public class CpuInfo {
 			results = scan(verbose);
 			
 			for(Result result : results) {
-				if (result.sizeInBits <= numberOfProcessors) {
+				if (numberOfProcessors <= result.sizeInBits) {
 					chosenResult = result;
 					break;
 				}
