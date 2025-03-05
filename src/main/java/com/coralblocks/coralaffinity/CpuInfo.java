@@ -461,7 +461,8 @@ public class CpuInfo {
 			
 			String ic = "NOT_DEFINED";
 			if (isolcpus.length != 0) {
-				ic = arrayToString(isolcpus) + "=(" + toString(getBitmask(isolcpus, procs)) + ")";
+				long[] bitmask = getBitmask(isolcpus, procs);
+				ic = arrayToString(isolcpus) + "=(" + toString(bitmask) + "-" + toBinaryString(bitmask) + ")";
 			}
 			
 			printGreen("RESULTS: allEqual=" + allEqual(results) 
