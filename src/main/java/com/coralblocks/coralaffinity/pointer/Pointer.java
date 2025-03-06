@@ -15,6 +15,14 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		this.sizeInBytes = sizeInBytes;
 	}
 	
+	static byte[] splitLongIntoBytes(long value) {
+	    byte[] result = new byte[8];
+	    for (int i = 0; i < 8; i++) {
+	        result[i] = (byte) ((value >> (8 * i)) & 0xFF);
+	    }
+	    return result;
+	}
+	
 	@Override
 	public final int getSizeInBytes() {
 		return sizeInBytes;
