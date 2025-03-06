@@ -24,7 +24,7 @@ public class _32BitsPointer extends Pointer {
 	
 	@Override
 	public final long[] getValue() {
-		long[] value = new long[4];
+		long[] value = new long[1];
 		int i = getPointer().getInt(0);
 		value[0] = i & 0xFFFFFFFFL;
 		return value;

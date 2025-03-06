@@ -25,7 +25,7 @@ public class _24BitsPointer extends Pointer {
 	
 	@Override
 	public final long[] getValue() {
-		long[] value = new long[4];
+		long[] value = new long[1];
 		short s = getPointer().getShort(0);
 		byte b = getPointer().getByte(2);
 		value[0] = (((long) b & 0xFFL) << 16) | (((long) s) & 0xFFFFL);

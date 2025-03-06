@@ -25,7 +25,7 @@ public class _72BitsPointer extends Pointer {
 	
 	@Override
 	public final long[] getValue() {
-		long[] value = new long[4];
+		long[] value = new long[2];
 		long l = getPointer().getLong(0);
 		byte b = getPointer().getByte(8);
 		value[0] = l;

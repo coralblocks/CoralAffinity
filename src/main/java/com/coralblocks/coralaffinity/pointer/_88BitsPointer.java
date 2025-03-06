@@ -26,7 +26,7 @@ public class _88BitsPointer extends Pointer {
 	
 	@Override
 	public final long[] getValue() {
-		long[] value = new long[4];
+		long[] value = new long[2];
 		long l = getPointer().getLong(0);
 		short s = getPointer().getShort(8);
 		byte b = getPointer().getByte(10);

@@ -24,7 +24,7 @@ public class _16BitsPointer extends Pointer {
 	
 	@Override
 	public final long[] getValue() {
-		long[] value = new long[4];
+		long[] value = new long[1];
 		short s = getPointer().getShort(0);
 		value[0] = s & 0xFFFFL;
 		return value;

@@ -26,7 +26,7 @@ public class _144BitsPointer extends Pointer {
 	
 	@Override
 	public final long[] getValue() {
-		long[] value = new long[4];
+		long[] value = new long[3];
 		long l1 = getPointer().getLong(0);
 		long l2 = getPointer().getLong(8);
 		short s = getPointer().getShort(16);
