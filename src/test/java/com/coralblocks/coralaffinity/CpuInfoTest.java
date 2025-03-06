@@ -178,6 +178,8 @@ public class CpuInfoTest {
 		
 		Assert.assertEquals(bitmask[0], mask);
 		Assert.assertEquals(bitmask[1], mask2);
+		Assert.assertEquals(bitmask[2], 0L);
+		Assert.assertEquals(3, bitmask.length);
 	}
 	
 	@Test
