@@ -25,8 +25,22 @@ public class CpuInfo {
 		public long[] cpuMask;
 	}
 	
+	static class IntHolder {
+		
+		private final int value;
+		
+		IntHolder(int value) {
+			this.value = value;
+		}
+		
+		int getValue() {
+			return value;
+		}
+	}
+	
 	private static boolean isInitialized = false;
 	private static int numberOfProcessors = -1;
+	private static IntHolder numberOfProcessorsHolder = null;
 	private static boolean isEnabled = true;
 	private static Boolean isAvailable = null;
 	private static int[] isolcpus = null;
@@ -66,6 +80,7 @@ public class CpuInfo {
 		if (isAvailable) {
 			
 			numberOfProcessors = getLogicalProcessors();
+			numberOfProcessorsHolder = new IntHolder(numberOfProcessors);
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors);
 			
 			if (numberOfProcessors <= 0) throw new RuntimeException("Got an invalid number of processors: " + numberOfProcessors);
@@ -98,7 +113,7 @@ public class CpuInfo {
 						printlnGreen(VERBOSE_PREFIX + "sizeInBits: " + r.sizeInBits
 							+ " => cpuMask: " + toString(r.cpuMask)
 							+ " (" + toBinaryString(r.cpuMask) + ")"
-							+ " procs=" + arrayToString(getProcsFromBitmask(r.cpuMask, numberOfProcessors)));
+							+ " procs=" + arrayToString(getProcsFromBitmask(numberOfProcessorsHolder, r.cpuMask)));
 					}
 					
 					System.out.println();
@@ -119,7 +134,7 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBits=" + chosenBitmask.sizeInBits
 					+ " cpuMask=" + toString(chosenBitmask.cpuMask)
 					+ "-(" + toBinaryString(chosenBitmask.cpuMask) + ")"
-					+ " procs=" + arrayToString(getProcsFromBitmask(chosenBitmask.cpuMask, numberOfProcessors)));
+					+ " procs=" + arrayToString(getProcsFromBitmask(numberOfProcessorsHolder, chosenBitmask.cpuMask)));
 		}
 		
 		isInitialized = true;
@@ -190,7 +205,7 @@ public class CpuInfo {
 		} else {
 			a = toString(allowedCpuBitmask)
 					+ "-(" + toBinaryString(allowedCpuBitmask) + ")"
-					+ " procs=" + arrayToString(getProcsFromBitmask(allowedCpuBitmask, numberOfProcessors));
+					+ " procs=" + arrayToString(getProcsFromBitmask(numberOfProcessorsHolder, allowedCpuBitmask));
 		}
 		
 		System.out.println("allowedCpusBitmask: " + a);
@@ -427,7 +442,7 @@ public class CpuInfo {
 		if (!isInitialized || !isAvailable()) {
 			return null;
 		}
-		return getBitmask(bitsToSetToZero, numberOfProcessors);
+		return getBitmask(numberOfProcessorsHolder, bitsToSetToZero);
 	}
 	
 	private static void ensureValidBits(int[] bitsToSetToZero, int numberOfProcessors) {
@@ -455,7 +470,9 @@ public class CpuInfo {
 	    return truncated ^ mask;
 	}
 	
-	static long[] getBitmask(int[] bitsToSetToOne, int numberOfProcessors) {
+	static long[] getBitmask(IntHolder numberOfProcessorsHolder, int[] bitsToSetToOne) {
+		
+		final int numberOfProcessors = numberOfProcessorsHolder.getValue();
 		
 		ensureValidBits(bitsToSetToOne, numberOfProcessors);
 		
@@ -499,35 +516,23 @@ public class CpuInfo {
 	    return toReturn;
 	}
 	
-	public static int[] getProcsFromBitmask(long bitmask) {
+	public static int[] getProcsFromBitmask(long ... bitmask) {
+		
 		if (!isInitialized || !isAvailable()) {
 			return null;
 		}
-		return getProcsFromBitmask(bitmask, numberOfProcessors);
+		return getProcsFromBitmask(numberOfProcessorsHolder, bitmask);
 	}
 	
-	static int[] getProcsFromBitmask(long bitmask, int numberOfProcessors) {
-		long[] array = new long[1];
-		array[0] = bitmask;
-		return getProcsFromBitmask(array, numberOfProcessors);
-	}
-	
-	public static int[] getProcsFromBitmask(long[] bitmask) {
-		if (!isInitialized || !isAvailable()) {
-			return null;
-		}
-		return getProcsFromBitmask(bitmask, numberOfProcessors);
-	}
-	
-	static int[] getProcsFromBitmask(long[] bitmask, int numberOfProcessors) {
+	static int[] getProcsFromBitmask(IntHolder numberOfProcessorsHolder, long ... bitmask) {
 		
 		List<Integer> list = new ArrayList<Integer>(256);
 		
-		int remainingBits = numberOfProcessors;
+		int remainingBits = numberOfProcessorsHolder.getValue();
 
 		for(int i = 0; i < bitmask.length; i++) {
 			
-			long _64bitmask = bitmask[i];
+			long bm = bitmask[i];
 			
 			int sizeInBits;
 			if (remainingBits - 64 >= 0) {
@@ -536,7 +541,7 @@ public class CpuInfo {
 				sizeInBits = remainingBits;
 			}
 			
-			int[] procs = getSetBitPositions(_64bitmask, sizeInBits);
+			int[] procs = getSetBitPositions(bm, sizeInBits);
 			
 			int toAdd = i * 64;
 			for(int proc : procs) {

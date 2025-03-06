@@ -3,18 +3,20 @@ package com.coralblocks.coralaffinity;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.coralblocks.coralaffinity.CpuInfo.IntHolder;
+
 public class CpuInfoTest {
 	
 	@Test
 	public void testBitmasks() {
 		
-		final int numberOfProcessors = 16;
+		final IntHolder numberOfProcessors = new IntHolder(16);
 		
 		String bits = "1111000011110";
 		
 		int[] procs = { 1,2,3,4,9,10,11,12 };
 		
-		long[] bitmasks = CpuInfo.getBitmask(procs, numberOfProcessors);
+		long[] bitmasks = CpuInfo.getBitmask(numberOfProcessors, procs);
 		
 		Assert.assertEquals(1, bitmasks.length);
 		
@@ -22,7 +24,7 @@ public class CpuInfoTest {
 		
 		Assert.assertEquals(bits, Long.toBinaryString(7710));
 		
-		long inverted = CpuInfo.invertBits(bitmasks[0], numberOfProcessors);
+		long inverted = CpuInfo.invertBits(bitmasks[0], numberOfProcessors.getValue());
 		
 		Assert.assertEquals(57825, inverted);
 		
@@ -30,28 +32,28 @@ public class CpuInfoTest {
 		
 		Assert.assertEquals(invertedBits, Long.toBinaryString(inverted));
 		
-		int[] procsBack = CpuInfo.getProcsFromBitmask(bitmasks[0], numberOfProcessors);
+		int[] procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, bitmasks[0]);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
 		long[] array = new long[2];
 		array[0] = bitmasks[0];
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
 		array = new long[3];
 		array[0] = bitmasks[0];
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
 		array = new long[4];
 		array[0] = bitmasks[0];
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -61,7 +63,7 @@ public class CpuInfoTest {
 		array[0] = bitmasks[0];
 		array[1] = 0xFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -70,7 +72,7 @@ public class CpuInfoTest {
 		array[1] = 0xFFL;
 		array[2] = 0xFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -80,7 +82,7 @@ public class CpuInfoTest {
 		array[2] = 0xFFFFL;
 		array[3] = 0xFFFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -91,7 +93,7 @@ public class CpuInfoTest {
 		array[3] = 0xFFFFFFL;
 		array[4] = 0xFFFFFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -103,7 +105,7 @@ public class CpuInfoTest {
 		array[4] = 0xFFFFFFFFL;
 		array[5] = 0xFFFFFFFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(array, numberOfProcessors);
+		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 	}
