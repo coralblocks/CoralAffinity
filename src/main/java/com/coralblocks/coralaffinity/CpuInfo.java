@@ -161,7 +161,14 @@ public class CpuInfo {
 		if (cpuBitmasks == null) {
 			r = "NOT_AVAILABLE";
 		} else {
-			r = String.valueOf(cpuBitmasks.length);
+			
+			StringBuilder sb = new StringBuilder();
+			for(CpuBitmask cp : cpuBitmasks) {
+				if (sb.length() > 0) sb.append(", ");
+				sb.append(cp.sizeInBits).append(" bits");
+			}
+			
+			r = String.valueOf(cpuBitmasks.length) + " (" + sb.toString() + ")";
 		}
 		
 		System.out.println("cpuBitmasksFound: " + r);
@@ -258,10 +265,6 @@ public class CpuInfo {
 	
 	public static int[] getIsolCpus() {
 		return isolcpus;
-	}
-	
-	public static CpuBitmask[] getCpuBitmasksFound() {
-		return cpuBitmasks;
 	}
 	
 	public static long[] getAllowedCpuBitmask() {
