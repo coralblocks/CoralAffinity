@@ -179,9 +179,10 @@ public class CpuInfo {
 			
 			StringBuilder sb = new StringBuilder();
 			for(CpuBitmask cp : cpuBitmasks) {
-				if (sb.length() > 0) sb.append(", ");
-				sb.append(cp.sizeInBits).append(" bits");
+				if (sb.length() > 0) sb.append(",");
+				sb.append(cp.sizeInBits);
 			}
+			sb.append(" (in bits)");
 			
 			r = String.valueOf(cpuBitmasks.length) + " => " + sb.toString();
 		}
