@@ -147,8 +147,7 @@ public class CpuInfo {
 		} else if (isolcpus.length == 0) {
 			ic = "NOT_DEFINED";
 		} else {
-			long[] bitmask = getBitmask(isolcpus, numberOfProcessors);
-			ic = arrayToString(isolcpus) + " (" + toString(bitmask) + "-" + toBinaryString(bitmask) + ")";
+			ic = arrayToString(isolcpus);
 		}
 		
 		System.out.println("isolcpus: " + ic);
@@ -174,7 +173,18 @@ public class CpuInfo {
 					+ " procs=" + arrayToString(getProcsFromBitmask(chosenBitmask.defaultCpuMask, numberOfProcessors));
 		}
 		
-		System.out.println("chosenBitmask: " + c);
+		System.out.println("chosenBitmaskSize: " + c);
+		
+		String a;
+		if (chosenBitmask == null || numberOfProcessors <= 0) {
+			a = "NOT_AVAILABLE";
+		} else {
+			a = toString(chosenBitmask.defaultCpuMask)
+					+ "-(" + toBinaryString(chosenBitmask.defaultCpuMask) + ")"
+					+ " procs=" + arrayToString(getProcsFromBitmask(chosenBitmask.defaultCpuMask, numberOfProcessors));
+		}
+		
+		System.out.println("allowedCpusBitmask: " + a);
 	}
 	
 	private static String getSizeInBits(Bitmask[] bitmasks) {
