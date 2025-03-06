@@ -111,6 +111,56 @@ public class CpuInfoTest {
 	}
 	
 	@Test
+	public void testBitsNoMultipleOf64() {
+		
+		String binary = "0011";
+		
+		long mask = Long.parseLong(binary, 2);
+		
+		int[] expected = new int[] { 0, 1 };
+		
+		int[] procs = CpuInfo.getProcsFromBitmask(new IntHolder(10), mask);
+		
+		Assert.assertArrayEquals(expected, procs);
+		
+		binary = "1100";
+		
+		mask = Long.parseLong(binary, 2);
+		
+		expected = new int[] { 2, 3 };
+		
+		procs = CpuInfo.getProcsFromBitmask(new IntHolder(11), mask);
+		
+		Assert.assertArrayEquals(expected, procs);
+		
+		// 64 bits just to test
+		binary = "0010000000000000000000000001000000000000000000000000000000000010";
+		
+		mask = Long.parseLong(binary, 2);
+		
+		expected = new int[] { 1, 36 , 61 };
+		
+		procs = CpuInfo.getProcsFromBitmask(new IntHolder(101), mask);
+		
+		Assert.assertArrayEquals(expected, procs);
+		
+		// now two longs
+		binary = "0010000000000000000000000001000000000000000000000000000000000010";
+		String binary2 = "01101011";
+		
+		mask = Long.parseLong(binary, 2);
+		long mask2 = Long.parseLong(binary2, 2);
+		
+		long[] doubleMask = new long[] { mask, mask2 };
+		
+		expected = new int[] { 1, 36 , 61 , 64, 65, 67, 69, 70 };
+		
+		procs = CpuInfo.getProcsFromBitmask(new IntHolder(150), doubleMask);
+		
+		Assert.assertArrayEquals(expected, procs);
+	}
+	
+	@Test
 	public void testInvertBits() {
 		
 		String s1 = "1010101010";
