@@ -472,7 +472,7 @@ public class CpuInfo {
 	    return truncated ^ mask;
 	}
 	
-	static long[] getBitmask(IntHolder numberOfProcessorsHolder, int[] bitsToSetToOne) {
+	static long[] getBitmask(IntHolder numberOfProcessorsHolder, int ... bitsToSetToOne) {
 		
 		final int numberOfProcessors = numberOfProcessorsHolder.getValue();
 		
@@ -482,15 +482,12 @@ public class CpuInfo {
 		
 		long[] bitmask = new long[numberOfLongs];
 		
-		for(int i = 0; i < bitmask.length; i++) {
+		for (int proc : bitsToSetToOne) {
 			
-	        long value = 0L;
-
-	        for (int num : bitsToSetToOne) {
-	            value |= (1L << num); // Set the bit at position num
-	        }
+	        int longIndex = proc / 64;
+	        int bitIndex = proc % 64;
 	        
-	        bitmask[i] = value;
+	        bitmask[longIndex] |= (1L << bitIndex);
 		}
         
         return bitmask;

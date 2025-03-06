@@ -111,6 +111,23 @@ public class CpuInfoTest {
 	}
 	
 	@Test
+	public void testProcsVarargs() {
+		
+		final IntHolder numberOfProcessors = new IntHolder(100);
+		
+		long[] bitmask = CpuInfo.getBitmask(numberOfProcessors, 1, 36 ,61 ,64, 65, 67, 69, 70);
+		
+		String binary = "0010000000000000000000000001000000000000000000000000000000000010";
+		String binary2 = "01101011";
+		
+		long mask = Long.parseLong(binary, 2);
+		long mask2 = Long.parseLong(binary2, 2);
+		
+		Assert.assertEquals(bitmask[0], mask);
+		Assert.assertEquals(bitmask[1], mask2);
+	}
+	
+	@Test
 	public void testBitsNoMultipleOf64() {
 		
 		String binary = "0011";
@@ -151,13 +168,16 @@ public class CpuInfoTest {
 		mask = Long.parseLong(binary, 2);
 		long mask2 = Long.parseLong(binary2, 2);
 		
-		long[] doubleMask = new long[] { mask, mask2 };
+		expected = new int[] { 1, 36 ,61 ,64, 65, 67, 69, 70 };
 		
-		expected = new int[] { 1, 36 , 61 , 64, 65, 67, 69, 70 };
-		
-		procs = CpuInfo.getProcsFromBitmask(new IntHolder(150), doubleMask);
+		procs = CpuInfo.getProcsFromBitmask(new IntHolder(150), mask, mask2);
 		
 		Assert.assertArrayEquals(expected, procs);
+		
+		long[] bitmask = CpuInfo.getBitmask(new IntHolder(150), procs);
+		
+		Assert.assertEquals(bitmask[0], mask);
+		Assert.assertEquals(bitmask[1], mask2);
 	}
 	
 	@Test
