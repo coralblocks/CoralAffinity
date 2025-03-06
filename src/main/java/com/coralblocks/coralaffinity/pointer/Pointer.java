@@ -66,5 +66,6 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		ALL.add(new _384BitsPointer());
 		ALL.add(new _448BitsPointer());
 		ALL.add(new _512BitsPointer());
+		ALL.add(new _1024BitsPointer());
 	}
 }
