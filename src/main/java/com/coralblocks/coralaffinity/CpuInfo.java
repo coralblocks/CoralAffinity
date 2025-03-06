@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -660,12 +661,13 @@ public class CpuInfo {
 	}
 	
 	private static boolean allEqual(CpuBitmask[] bitmasks) {
-		long[] array = null;
+		int[] procs = null;
 		for(CpuBitmask r : bitmasks) {
-			if (array == null) {
-				array = r.cpuMask;
-			} else if (!equal(array, r.cpuMask)) {
-				return false;
+			if (procs == null) {
+				procs = getProcsFromBitmask(new IntHolder(r.sizeInBits), r.cpuMask);
+			} else {
+				int[] other = getProcsFromBitmask(new IntHolder(r.sizeInBits), r.cpuMask);
+				if (!Arrays.equals(other, procs)) return false;
 			}
 		}
 		return true;
