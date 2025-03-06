@@ -142,7 +142,7 @@ public class CpuInfo {
 		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 		
 		String ic;
-		if (isolcpus == null) {
+		if (isolcpus == null || numberOfProcessors <= 0) {
 			ic = "NOT_AVAILABLE";
 		} else if (isolcpus.length == 0) {
 			ic = "NOT_DEFINED";
@@ -165,7 +165,7 @@ public class CpuInfo {
 		System.out.println("areBitmasksEqual: " + (areBitmasksEqual == null ? false : areBitmasksEqual.booleanValue()));
 		
 		String c;
-		if (chosenBitmask == null) {
+		if (chosenBitmask == null || numberOfProcessors <= 0) {
 			c = "NOT_AVAILABLE";
 		} else {
 			c = "sizeInBytes=" + chosenBitmask.sizeInBytes
@@ -417,7 +417,24 @@ public class CpuInfo {
 	    return (1L << sizeInBits) - 1;
 	}
 
-	public static long[] getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
+	public static long[] getBitmask(int ... bitsToSetToZero) {
+		if (!isInitialized || !isAvailable()) {
+			return null;
+		}
+		return getBitmask(bitsToSetToZero, numberOfProcessors);
+	}
+	
+	private static void ensureValidBits(int[] bitsToSetToZero, int numberOfProcessors) {
+		for(int i : bitsToSetToZero) {
+			if (i < 0 || i >= numberOfProcessors) {
+				throw new IllegalArgumentException("Invalid bit! bit=" + i + " numberOfProcessors=" + numberOfProcessors);
+			}
+		}
+	}
+	
+	static long[] getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
+		
+		ensureValidBits(bitsToSetToZero, numberOfProcessors);
 		
 		int remainingBits = numberOfProcessors;
 		
@@ -470,13 +487,27 @@ public class CpuInfo {
 	    return toReturn;
 	}
 	
-	public static int[] getProcsFromBitmask(long bitmask, int numberOfProcessors) {
+	public static int[] getProcsFromBitmask(long bitmask) {
+		if (!isInitialized || !isAvailable()) {
+			return null;
+		}
+		return getProcsFromBitmask(bitmask, numberOfProcessors);
+	}
+	
+	static int[] getProcsFromBitmask(long bitmask, int numberOfProcessors) {
 		long[] array = new long[1];
 		array[0] = bitmask;
 		return getProcsFromBitmask(array, numberOfProcessors);
 	}
 	
-	public static int[] getProcsFromBitmask(long[] bitmask, int numberOfProcessors) {
+	public static int[] getProcsFromBitmask(long[] bitmask) {
+		if (!isInitialized || !isAvailable()) {
+			return null;
+		}
+		return getProcsFromBitmask(bitmask, numberOfProcessors);
+	}
+	
+	static int[] getProcsFromBitmask(long[] bitmask, int numberOfProcessors) {
 		
 		List<Integer> list = new ArrayList<Integer>(256);
 		
@@ -562,7 +593,7 @@ public class CpuInfo {
 		return bitmasks.toArray(array);
 	}
 	
-	public static String arrayToString(int[] arr) {
+	private static String arrayToString(int[] arr) {
 	    if (arr == null || arr.length == 0) {
 	        return "";
 	    }
@@ -593,7 +624,7 @@ public class CpuInfo {
 		return sb.toString();
 	}
 	
-	private static String toBinaryString(long[] value) {
+	static String toBinaryString(long[] value) {
 		StringBuilder sb = new StringBuilder();
 		for(long l : value) {
 			if (sb.length() > 0) sb.append("|");
