@@ -404,19 +404,6 @@ public class CpuInfo {
 		}
 	}
 	
-	private static long getOneBitmask(int sizeInBits) {
-		
-	    if (sizeInBits < 1 || sizeInBits > 64) {
-	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
-	    }
-	    
-	    if (sizeInBits == 64) {
-	        return -1L;
-	    }
-	    
-	    return (1L << sizeInBits) - 1;
-	}
-
 	public static long[] getBitmask(int ... bitsToSetToZero) {
 		if (!isInitialized || !isAvailable()) {
 			return null;
@@ -449,11 +436,9 @@ public class CpuInfo {
 	    return truncated ^ mask;
 	}
 	
-	static long[] getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
+	static long[] getBitmask(int[] bitsToSetToOne, int numberOfProcessors) {
 		
-		ensureValidBits(bitsToSetToZero, numberOfProcessors);
-		
-		int remainingBits = numberOfProcessors;
+		ensureValidBits(bitsToSetToOne, numberOfProcessors);
 		
 		int numberOfLongs = (numberOfProcessors - 1) / 64 + 1;
 		
@@ -461,19 +446,10 @@ public class CpuInfo {
 		
 		for(int i = 0; i < bitmask.length; i++) {
 			
-			int sizeInBits;
-			if (remainingBits - 64 >= 0) {
-				sizeInBits = 64;
-			} else {
-				sizeInBits = remainingBits;
-			}
-			
-			remainingBits -= 64;
-			
-	        long value = getOneBitmask(sizeInBits);
+	        long value = 0L;
 
-	        for (int num : bitsToSetToZero) {
-	            value &= ~(1L << num); // Clear the bit at position 'num'
+	        for (int num : bitsToSetToOne) {
+	            value |= (1L << num); // Set the bit at position num
 	        }
 	        
 	        bitmask[i] = value;
@@ -482,7 +458,7 @@ public class CpuInfo {
         return bitmask;
 	}
 	
-	private static int[] getClearedBitPositions(long bitmask, int sizeInBits) {
+	private static int[] getSetBitPositions(long bitmask, int sizeInBits) {
 		
 	    if (sizeInBits < 1 || sizeInBits > 64) {
 	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
@@ -491,7 +467,7 @@ public class CpuInfo {
 	    List<Integer> clearedPositions = new ArrayList<>();
 
 	    for (int i = 0; i < sizeInBits; i++) {
-	        if ((bitmask & (1L << i)) == 0) {
+	        if ((bitmask & (1L << i)) != 0) {
 	            clearedPositions.add(i);
 	        }
 	    }
@@ -541,7 +517,7 @@ public class CpuInfo {
 				sizeInBits = remainingBits;
 			}
 			
-			int[] procs = getClearedBitPositions(_64bitmask, sizeInBits);
+			int[] procs = getSetBitPositions(_64bitmask, sizeInBits);
 			
 			int toAdd = i * 64;
 			for(int proc : procs) {

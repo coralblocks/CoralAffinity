@@ -10,13 +10,25 @@ public class CpuInfoTest {
 		
 		final int numberOfProcessors = 16;
 		
+		String bits = "1111000011110";
+		
 		int[] procs = { 1,2,3,4,9,10,11,12 };
 		
 		long[] bitmasks = CpuInfo.getBitmask(procs, numberOfProcessors);
 		
 		Assert.assertEquals(1, bitmasks.length);
 		
-		Assert.assertEquals(57825, bitmasks[0]);
+		Assert.assertEquals(7710, bitmasks[0]);
+		
+		Assert.assertEquals(bits, Long.toBinaryString(7710));
+		
+		long inverted = CpuInfo.invertBits(bitmasks[0], numberOfProcessors);
+		
+		Assert.assertEquals(57825, inverted);
+		
+		String invertedBits = "1110000111100001";
+		
+		Assert.assertEquals(invertedBits, Long.toBinaryString(inverted));
 		
 		int[] procsBack = CpuInfo.getProcsFromBitmask(bitmasks[0], numberOfProcessors);
 		
