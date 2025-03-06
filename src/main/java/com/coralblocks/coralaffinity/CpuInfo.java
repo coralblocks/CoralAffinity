@@ -168,7 +168,7 @@ public class CpuInfo {
 				sb.append(cp.sizeInBits).append(" bits");
 			}
 			
-			r = String.valueOf(cpuBitmasks.length) + " (" + sb.toString() + ")";
+			r = String.valueOf(cpuBitmasks.length) + " => " + sb.toString();
 		}
 		
 		System.out.println("cpuBitmasksFound: " + r);
