@@ -204,7 +204,7 @@ public class CpuInfo {
 			a = "NOT_AVAILABLE";
 		} else {
 			a = toString(allowedCpuBitmask)
-					+ "-(" + toBinaryString(allowedCpuBitmask) + ")"
+					+ " (" + toBinaryString(allowedCpuBitmask) + ")"
 					+ " procs=" + arrayToString(getProcsFromBitmask(numberOfProcessorsHolder, allowedCpuBitmask));
 		}
 		
