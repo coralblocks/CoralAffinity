@@ -5,7 +5,7 @@ public class _320BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 40;
 
 	public _320BitsPointer() {
-		this((long) 0, (long) 0, (long) 0, (long) 0, (long) 0);
+		this(0L, 0L, 0L, 0L, 0L);
 	}
 	
 	public _320BitsPointer(long l1, long l2, long l3, long l4, long l5) {
@@ -15,7 +15,7 @@ public class _320BitsPointer extends Pointer {
 	
 	@Override
 	public void reset() {
-		set((long) 0, (long) 0, (long) 0, (long) 0, (long) 0);
+		set(0L, 0L, 0L, 0L, 0L);
 	}
 	
 	private void set(long l1, long l2, long l3, long l4, long l5) {

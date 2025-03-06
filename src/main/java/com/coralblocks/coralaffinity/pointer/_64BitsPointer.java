@@ -5,7 +5,7 @@ public class _64BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 8;
 
 	public _64BitsPointer() {
-		this((long) 0);
+		this(0L);
 	}
 	
 	public _64BitsPointer(long l) {
@@ -15,7 +15,7 @@ public class _64BitsPointer extends Pointer {
 	
 	@Override
 	public void reset() {
-		set((long) 0);
+		set(0L);
 	}
 	
 	private void set(long l) {

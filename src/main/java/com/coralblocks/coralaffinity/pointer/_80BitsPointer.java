@@ -5,7 +5,7 @@ public class _80BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 10;
 
 	public _80BitsPointer() {
-		this((long) 0, (short) 0);
+		this(0L, (short) 0);
 	}
 	
 	public _80BitsPointer(long l, short s) {
@@ -15,7 +15,7 @@ public class _80BitsPointer extends Pointer {
 	
 	@Override
 	public void reset() {
-		set((long) 0, (short) 0);
+		set(0L, (short) 0);
 	}
 	
 	private void set(long l, short s) {

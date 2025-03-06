@@ -5,7 +5,7 @@ public class _112BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 14;
 
 	public _112BitsPointer() {
-		this((long) 0, (int) 0, (short) 0);
+		this(0L, (int) 0, (short) 0);
 	}
 	
 	public _112BitsPointer(long l, int i, short s) {
@@ -15,7 +15,7 @@ public class _112BitsPointer extends Pointer {
 	
 	@Override
 	public void reset() {
-		set((long) 0, (int) 0, (short) 0);
+		set(0L, (int) 0, (short) 0);
 	}
 	
 	private void set(long l, int i, short s) {

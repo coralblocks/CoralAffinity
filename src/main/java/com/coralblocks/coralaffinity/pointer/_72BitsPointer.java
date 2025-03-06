@@ -5,7 +5,7 @@ public class _72BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 9;
 
 	public _72BitsPointer() {
-		this((long) 0, (byte) 0);
+		this(0L, (byte) 0);
 	}
 	
 	public _72BitsPointer(long l, byte b) {
@@ -15,7 +15,7 @@ public class _72BitsPointer extends Pointer {
 	
 	@Override
 	public void reset() {
-		set((long) 0, (byte) 0);
+		set(0L, (byte) 0);
 	}
 	
 	private void set(long l, byte b) {

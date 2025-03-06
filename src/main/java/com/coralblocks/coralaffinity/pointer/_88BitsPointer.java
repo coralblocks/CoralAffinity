@@ -5,7 +5,7 @@ public class _88BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 11;
 
 	public _88BitsPointer() {
-		this((long) 0, (short) 0, (byte) 0);
+		this(0L, (short) 0, (byte) 0);
 	}
 	
 	public _88BitsPointer(long l, short s, byte b) {
@@ -15,7 +15,7 @@ public class _88BitsPointer extends Pointer {
 	
 	@Override
 	public void reset() {
-		set((long) 0, (short) 0, (byte) 0);
+		set(0L, (short) 0, (byte) 0);
 	}
 	
 	private void set(long l, short s, byte b) {
