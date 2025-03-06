@@ -16,6 +16,8 @@ public class Affinity {
 		public static final CLibrary INSTANCE = (CLibrary) Native.load("c", CLibrary.class);
 		
 		public int sched_getaffinity(final int pid, final int cpusetsize, final PointerType cpuset) throws LastErrorException;
+		
+		public int sched_setaffinity(final int pid, final int cpusetsize, final PointerType cpuset) throws LastErrorException;
 	}
 	
 	public static CLibrary getLib() {
