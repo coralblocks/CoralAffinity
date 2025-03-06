@@ -5,21 +5,12 @@ public class _8BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 1;
 
 	public _8BitsPointer() {
-		this((byte) 0);
+		this(0L);
 	}
 	
-	public _8BitsPointer(byte b) {
+	public _8BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(b);
-	}
-	
-	@Override
-	public void reset() {
-		set((byte) 0);
-	}
-	
-	private void set(byte b) {
-		getPointer().setByte(0, b);
+		set(l);
 	}
 	
 	@Override

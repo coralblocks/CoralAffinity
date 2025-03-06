@@ -23,6 +23,31 @@ public abstract class Pointer extends ByReference implements CpuMask {
 	    return result;
 	}
 	
+	static byte[] extractBytes(long[] longs, int numBytes) {
+	    byte[] result = new byte[numBytes];
+	    int bytesExtracted = 0;
+	    
+	    for (long l : longs) {
+	        if (bytesExtracted >= numBytes) {
+	            break;
+	        }
+	        byte[] bytes = splitLongIntoBytes(l);
+	        for (int i = 0; i < 8 && bytesExtracted < numBytes; i++) {
+	            result[bytesExtracted++] = bytes[i];
+	        }
+	    }
+	    
+	    return result;
+	}
+	
+	protected void set(long ... l) {
+		byte[] bytes = extractBytes(l, sizeInBytes);
+		int index = 0;
+		for(byte b : bytes) {
+			getPointer().setByte(index++, b);
+		}
+	}
+	
 	@Override
 	public final int getSizeInBytes() {
 		return sizeInBytes;
@@ -33,7 +58,9 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		return sizeInBytes * 8;
 	}
 	
-	public abstract void reset();
+	public void reset() {
+		set(0L);
+	}
 	
 	public static final List<Pointer> ALL = new ArrayList<Pointer>(32);
 	

@@ -5,24 +5,12 @@ public class _168BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 21;
 
 	public _168BitsPointer() {
-		this(0L, 0L, (int) 0, (byte) 0);
+		this(0L);
 	}
 	
-	public _168BitsPointer(long l1, long l2, int i, byte b) {
+	public _168BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l1, l2, i, b);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, 0L, (int) 0, (byte) 0);
-	}
-	
-	private void set(long l1, long l2, int i, byte b) {
-		getPointer().setLong(0, l1);
-		getPointer().setLong(8, l2);
-		getPointer().setInt(16, i);
-		getPointer().setByte(20, b);		
+		set(l);
 	}
 	
 	@Override

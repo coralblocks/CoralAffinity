@@ -5,22 +5,12 @@ public class _80BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 10;
 
 	public _80BitsPointer() {
-		this(0L, (short) 0);
+		this(0L);
 	}
 	
-	public _80BitsPointer(long l, short s) {
+	public _80BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l, s);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, (short) 0);
-	}
-	
-	private void set(long l, short s) {
-		getPointer().setLong(0, l);
-		getPointer().setShort(8, s);
+		set(l);
 	}
 	
 	@Override

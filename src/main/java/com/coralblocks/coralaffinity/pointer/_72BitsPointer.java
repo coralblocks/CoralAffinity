@@ -5,22 +5,12 @@ public class _72BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 9;
 
 	public _72BitsPointer() {
-		this(0L, (byte) 0);
+		this(0L);
 	}
 	
-	public _72BitsPointer(long l, byte b) {
+	public _72BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l, b);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, (byte) 0);
-	}
-	
-	private void set(long l, byte b) {
-		getPointer().setLong(0, l);
-		getPointer().setByte(8, b);
+		set(l);
 	}
 	
 	@Override

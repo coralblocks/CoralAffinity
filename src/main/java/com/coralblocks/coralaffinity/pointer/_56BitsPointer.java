@@ -5,23 +5,12 @@ public class _56BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 7;
 
 	public _56BitsPointer() {
-		this((int) 0, (short) 0, (byte) 0);
+		this(0L);
 	}
 	
-	public _56BitsPointer(int i, short s, byte b) {
+	public _56BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(i, s, b);
-	}
-	
-	@Override
-	public void reset() {
-		set((int) 0, (short) 0, (byte) 0);
-	}
-	
-	private void set(int i, short s, byte b) {
-		getPointer().setInt(0, i);
-		getPointer().setShort(4, s);
-		getPointer().setByte(6, b);
+		set(l);
 	}
 	
 	@Override

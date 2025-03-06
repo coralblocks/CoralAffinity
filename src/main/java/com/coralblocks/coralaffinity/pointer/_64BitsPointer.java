@@ -8,18 +8,9 @@ public class _64BitsPointer extends Pointer {
 		this(0L);
 	}
 	
-	public _64BitsPointer(long l) {
+	public _64BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
 		set(l);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L);
-	}
-	
-	private void set(long l) {
-		getPointer().setLong(0, l);
 	}
 	
 	@Override

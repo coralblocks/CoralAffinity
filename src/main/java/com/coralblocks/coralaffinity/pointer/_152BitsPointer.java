@@ -5,24 +5,12 @@ public class _152BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 19;
 
 	public _152BitsPointer() {
-		this(0L, 0L, (short) 0, (byte) 0);
+		this(0L);
 	}
 	
-	public _152BitsPointer(long l1, long l2, short s, byte b) {
+	public _152BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l1, l2, s, b);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, 0L, (short) 0, (byte) 0);
-	}
-	
-	private void set(long l1, long l2, short s, byte b) {
-		getPointer().setLong(0, l1);
-		getPointer().setLong(8, l2);
-		getPointer().setShort(16, s);
-		getPointer().setByte(18, b);
+		set(l);
 	}
 	
 	@Override

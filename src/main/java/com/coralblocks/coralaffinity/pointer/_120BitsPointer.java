@@ -5,24 +5,12 @@ public class _120BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 15;
 
 	public _120BitsPointer() {
-		this(0L, (int) 0, (short) 0, (byte) 0);
+		this(0L);
 	}
 	
-	public _120BitsPointer(long l, int i, short s, byte b) {
+	public _120BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l, i, s, b);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, (int) 0, (short) 0, (byte) 0);
-	}
-	
-	private void set(long l, int i, short s, byte b) {
-		getPointer().setLong(0, l);
-		getPointer().setInt(8, i);
-		getPointer().setShort(12, s);
-		getPointer().setByte(14, b);
+		set(l);
 	}
 	
 	@Override

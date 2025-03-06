@@ -5,28 +5,12 @@ public class _512BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 64;
 
 	public _512BitsPointer() {
-		this(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
+		this(0L);
 	}
 	
-	public _512BitsPointer(long l1, long l2, long l3, long l4, long l5, long l6, long l7, long l8) {
+	public _512BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l1, l2, l3, l4, l5, l6, l7, l8);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, 0L, 0L, 0L, 0L, 0L, 0L, 0L);
-	}
-	
-	private void set(long l1, long l2, long l3, long l4, long l5, long l6, long l7, long l8) {
-		getPointer().setLong(0, l1);
-		getPointer().setLong(8, l2);
-		getPointer().setLong(16, l3);
-		getPointer().setLong(24, l4);
-		getPointer().setLong(32, l5);
-		getPointer().setLong(40, l6);
-		getPointer().setLong(48, l7);
-		getPointer().setLong(56, l8);
+		set(l);
 	}
 	
 	@Override

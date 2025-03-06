@@ -5,22 +5,12 @@ public class _24BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 3;
 
 	public _24BitsPointer() {
-		this((short) 0, (byte) 0);
+		this(0L);
 	}
 	
-	public _24BitsPointer(short s, byte b) {
+	public _24BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(s, b);
-	}
-	
-	@Override
-	public void reset() {
-		set((short) 0, (byte) 0);
-	}
-	
-	private void set(short s, byte b) {
-		getPointer().setShort(0, s);
-		getPointer().setByte(2, b);
+		set(l);
 	}
 	
 	@Override

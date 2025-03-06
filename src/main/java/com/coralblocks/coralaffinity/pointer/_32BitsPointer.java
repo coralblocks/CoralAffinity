@@ -5,21 +5,12 @@ public class _32BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 4;
 
 	public _32BitsPointer() {
-		this((int) 0);
+		this(0L);
 	}
 	
-	public _32BitsPointer(int i) {
+	public _32BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(i);
-	}
-	
-	@Override
-	public void reset() {
-		set((int) 0);
-	}
-	
-	private void set(int i) {
-		getPointer().setInt(0, i);
+		set(l);
 	}
 	
 	@Override

@@ -5,23 +5,12 @@ public class _104BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 13;
 
 	public _104BitsPointer() {
-		this(0L, (int) 0, (byte) 0);
+		this(0L);
 	}
 	
-	public _104BitsPointer(long l, int i, byte b) {
+	public _104BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l, i, b);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, (int) 0, (byte) 0);
-	}
-	
-	private void set(long l, int i, byte b) {
-		getPointer().setLong(0, l);
-		getPointer().setInt(8, i);
-		getPointer().setByte(12, b);
+		set(l);
 	}
 	
 	@Override

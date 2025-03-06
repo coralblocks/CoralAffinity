@@ -5,24 +5,12 @@ public class _224BitsPointer extends Pointer {
 	public static final int SIZE_IN_BYTES = 28;
 
 	public _224BitsPointer() {
-		this(0L, 0L, 0L, (int) 0);
+		this(0L);
 	}
 	
-	public _224BitsPointer(long l1, long l2, long l3, int i) {
+	public _224BitsPointer(long ... l) {
 		super(SIZE_IN_BYTES);
-		set(l1, l2, l3, i);
-	}
-	
-	@Override
-	public void reset() {
-		set(0L, 0L, 0L, (int) 0);
-	}
-	
-	private void set(long l1, long l2, long l3, int i) {
-		getPointer().setLong(0, l1);
-		getPointer().setLong(8, l2);
-		getPointer().setLong(16, l3);
-		getPointer().setInt(24, i);
+		set(l);
 	}
 	
 	@Override
