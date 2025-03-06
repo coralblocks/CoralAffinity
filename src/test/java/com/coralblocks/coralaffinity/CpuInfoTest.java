@@ -95,4 +95,64 @@ public class CpuInfoTest {
 		
 		Assert.assertArrayEquals(procs, procsBack);
 	}
+	
+	@Test
+	public void testInvertBits() {
+		
+		String s1 = "1010101010";
+		
+		long l1 = Long.parseLong(s1, 2);
+		
+		String s2 = Long.toBinaryString(l1);
+		
+		Assert.assertEquals(s1, s2);
+		
+		long l2 = CpuInfo.invertBits(l1, s1.length());
+		
+		String inverted = "0101010101";
+		
+		String s3 = Long.toBinaryString(l2);
+		
+		Assert.assertEquals(inverted, "0" + s3);
+	}
+	
+	@Test
+	public void testInvertBits2() {
+		
+		String s1 = "1010101010";
+		
+		long l1 = Long.parseLong(s1, 2);
+		
+		String s2 = Long.toBinaryString(l1);
+		
+		Assert.assertEquals(s1, s2);
+		
+		long l2 = CpuInfo.invertBits(l1, s1.length() + 2);
+		
+		String inverted = "110101010101";
+		
+		String s3 = Long.toBinaryString(l2);
+		
+		Assert.assertEquals(inverted, s3);
+	}
+	
+	@Test
+	public void testInvertBits3() {
+		
+		String s1 = "1010101010";
+		
+		long l1 = Long.parseLong(s1, 2);
+		
+		String s2 = Long.toBinaryString(l1);
+		
+		Assert.assertEquals(s1, s2);
+		
+		long l2 = CpuInfo.invertBits(l1, s1.length() - 2);
+		
+		String inverted = "01010101";
+		
+		String s3 = Long.toBinaryString(l2);
+		
+		Assert.assertEquals(inverted, "0" + s3);
+	}
 }

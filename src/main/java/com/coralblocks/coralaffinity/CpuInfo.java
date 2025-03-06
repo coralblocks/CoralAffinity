@@ -432,6 +432,23 @@ public class CpuInfo {
 		}
 	}
 	
+	static long invertBits(long value, int numberOfBits) {
+		
+	    if (numberOfBits < 0 || numberOfBits > 64) {
+	        throw new IllegalArgumentException("numberOfBits must be between 0 and 64 (inclusive).");
+	    }
+	    
+	    if (numberOfBits == 64) {
+	        return ~value;
+	    }
+	    
+	    long mask = (1L << numberOfBits) - 1;
+	    
+	    long truncated = value & mask;
+	    
+	    return truncated ^ mask;
+	}
+	
 	static long[] getBitmask(int[] bitsToSetToZero, int numberOfProcessors) {
 		
 		ensureValidBits(bitsToSetToZero, numberOfProcessors);
