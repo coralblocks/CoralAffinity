@@ -16,7 +16,7 @@ public class CpuInfoTest {
 		
 		int[] procs = { 1,2,3,4,9,10,11,12 };
 		
-		long[] bitmasks = CpuInfo.getBitmask(numberOfProcessors, procs);
+		long[] bitmasks = CpuInfo.getCpuBitmaskFromProcIds(numberOfProcessors, procs);
 		
 		Assert.assertEquals(1, bitmasks.length);
 		
@@ -32,28 +32,28 @@ public class CpuInfoTest {
 		
 		Assert.assertEquals(invertedBits, Long.toBinaryString(inverted));
 		
-		int[] procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, bitmasks[0]);
+		int[] procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, bitmasks[0]);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
 		long[] array = new long[2];
 		array[0] = bitmasks[0];
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
 		array = new long[3];
 		array[0] = bitmasks[0];
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
 		array = new long[4];
 		array[0] = bitmasks[0];
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -63,7 +63,7 @@ public class CpuInfoTest {
 		array[0] = bitmasks[0];
 		array[1] = 0xFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -72,7 +72,7 @@ public class CpuInfoTest {
 		array[1] = 0xFFL;
 		array[2] = 0xFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -82,7 +82,7 @@ public class CpuInfoTest {
 		array[2] = 0xFFFFL;
 		array[3] = 0xFFFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -93,7 +93,7 @@ public class CpuInfoTest {
 		array[3] = 0xFFFFFFL;
 		array[4] = 0xFFFFFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 		
@@ -105,7 +105,7 @@ public class CpuInfoTest {
 		array[4] = 0xFFFFFFFFL;
 		array[5] = 0xFFFFFFFFFFL;
 		
-		procsBack = CpuInfo.getProcsFromBitmask(numberOfProcessors, array);
+		procsBack = CpuInfo.getProcIdsFromCpuBitmask(numberOfProcessors, array);
 		
 		Assert.assertArrayEquals(procs, procsBack);
 	}
@@ -115,7 +115,7 @@ public class CpuInfoTest {
 		
 		final IntHolder numberOfProcessors = new IntHolder(100);
 		
-		long[] bitmask = CpuInfo.getBitmask(numberOfProcessors, 1, 36 ,61 ,64, 65, 67, 69, 70);
+		long[] bitmask = CpuInfo.getCpuBitmaskFromProcIds(numberOfProcessors, 1, 36 ,61 ,64, 65, 67, 69, 70);
 		
 		String binary = "0010000000000000000000000001000000000000000000000000000000000010";
 		String binary2 = "01101011";
@@ -136,7 +136,7 @@ public class CpuInfoTest {
 		
 		int[] expected = new int[] { 0, 1 };
 		
-		int[] procs = CpuInfo.getProcsFromBitmask(new IntHolder(10), mask);
+		int[] procs = CpuInfo.getProcIdsFromCpuBitmask(new IntHolder(10), mask);
 		
 		Assert.assertArrayEquals(expected, procs);
 		
@@ -146,7 +146,7 @@ public class CpuInfoTest {
 		
 		expected = new int[] { 2, 3 };
 		
-		procs = CpuInfo.getProcsFromBitmask(new IntHolder(11), mask);
+		procs = CpuInfo.getProcIdsFromCpuBitmask(new IntHolder(11), mask);
 		
 		Assert.assertArrayEquals(expected, procs);
 		
@@ -157,7 +157,7 @@ public class CpuInfoTest {
 		
 		expected = new int[] { 1, 36 , 61 };
 		
-		procs = CpuInfo.getProcsFromBitmask(new IntHolder(101), mask);
+		procs = CpuInfo.getProcIdsFromCpuBitmask(new IntHolder(101), mask);
 		
 		Assert.assertArrayEquals(expected, procs);
 		
@@ -170,11 +170,11 @@ public class CpuInfoTest {
 		
 		expected = new int[] { 1, 36 ,61 ,64, 65, 67, 69, 70 };
 		
-		procs = CpuInfo.getProcsFromBitmask(new IntHolder(150), mask, mask2);
+		procs = CpuInfo.getProcIdsFromCpuBitmask(new IntHolder(150), mask, mask2);
 		
 		Assert.assertArrayEquals(expected, procs);
 		
-		long[] bitmask = CpuInfo.getBitmask(new IntHolder(150), procs);
+		long[] bitmask = CpuInfo.getCpuBitmaskFromProcIds(new IntHolder(150), procs);
 		
 		Assert.assertEquals(bitmask[0], mask);
 		Assert.assertEquals(bitmask[1], mask2);
