@@ -20,9 +20,8 @@ public class CpuInfo {
     private static final String ANSI_GREEN = "\u001B[32m";
     private static final String VERBOSE_PREFIX = "---CoralAffinity---> ";
 	
-	public static class Bitmask {
+	private static class CpuBitmask {
 		public int sizeInBits;
-		public int sizeInBytes;
 		public long[] cpuMask;
 	}
 	
@@ -31,8 +30,9 @@ public class CpuInfo {
 	private static boolean isEnabled = true;
 	private static Boolean isAvailable = null;
 	private static int[] isolcpus = null;
-	private static Bitmask[] bitmasks = null;
-	private static Bitmask chosenBitmask = null;
+	private static CpuBitmask[] cpuBitmasks = null;
+	private static int chosenCpuBitmaskSizeInBits = -1;
+	private static long[] allowedCpuBitmask = null;
 	private static Boolean areBitmasksEqual = null;
 	private static Boolean isHyperthreadingOn = null;
 	
@@ -76,12 +76,14 @@ public class CpuInfo {
 			isolcpus = getIsolcpusNumbers(readProcCmdline());
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? arrayToString(isolcpus) : "NOT_DEFINED"));
 			
-			bitmasks = scan(verbose);
+			cpuBitmasks = scan(verbose);
 			
-			areBitmasksEqual = allEqual(bitmasks);
+			areBitmasksEqual = allEqual(cpuBitmasks);
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmasks are equal: " + areBitmasksEqual);
 			
-			for(Bitmask bm : bitmasks) {
+			CpuBitmask chosenBitmask = null;
+			
+			for(CpuBitmask bm : cpuBitmasks) {
 				if (numberOfProcessors <= bm.sizeInBits) {
 					chosenBitmask = bm;
 					break;
@@ -92,9 +94,9 @@ public class CpuInfo {
 				
 				if (verbose) {
 					
-					for(Bitmask r : bitmasks) {
-						printlnGreen(VERBOSE_PREFIX + "sizeInBytes: " + r.sizeInBytes
-							+ " (" + r.sizeInBits + " bits) => cpuMask: " + toString(r.cpuMask)
+					for(CpuBitmask r : cpuBitmasks) {
+						printlnGreen(VERBOSE_PREFIX + "sizeInBits: " + r.sizeInBits
+							+ " => cpuMask: " + toString(r.cpuMask)
 							+ " (" + toBinaryString(r.cpuMask) + ")"
 							+ " procs=" + arrayToString(getProcsFromBitmask(r.cpuMask, numberOfProcessors)));
 					}
@@ -103,16 +105,19 @@ public class CpuInfo {
 					
 					printlnRed(VERBOSE_PREFIX + "Could not choose a bitmask size to use!"
 							+ " numberOfProcessors=" + numberOfProcessors
-							+ " sizeInBits=" + getSizeInBits(bitmasks));
+							+ " sizeInBits=" + getSizeInBits(cpuBitmasks));
 				}
 				
 				throw new RuntimeException("Could not choose a bitmask size to use!"
 						+ " numberOfProcessors=" + numberOfProcessors
-						+ " sizeInBits=" + getSizeInBits(bitmasks));
+						+ " sizeInBits=" + getSizeInBits(cpuBitmasks));
 			}
 			
-			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBytes=" + chosenBitmask.sizeInBytes
-					+ " sizeInBits=" + chosenBitmask.sizeInBits + " cpuMask=" + toString(chosenBitmask.cpuMask)
+			chosenCpuBitmaskSizeInBits = chosenBitmask.sizeInBits;
+			allowedCpuBitmask = chosenBitmask.cpuMask;
+			
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBits=" + chosenBitmask.sizeInBits
+					+ " cpuMask=" + toString(chosenBitmask.cpuMask)
 					+ "-(" + toBinaryString(chosenBitmask.cpuMask) + ")"
 					+ " procs=" + arrayToString(getProcsFromBitmask(chosenBitmask.cpuMask, numberOfProcessors)));
 		}
@@ -153,41 +158,40 @@ public class CpuInfo {
 		System.out.println("isolcpus: " + ic);
 		
 		String r;
-		if (bitmasks == null) {
+		if (cpuBitmasks == null) {
 			r = "NOT_AVAILABLE";
 		} else {
-			r = String.valueOf(bitmasks.length);
+			r = String.valueOf(cpuBitmasks.length);
 		}
 		
-		System.out.println("bitmasksFound: " + r);
+		System.out.println("cpuBitmasksFound: " + r);
 		
 		System.out.println("areBitmasksEqual: " + (areBitmasksEqual == null ? false : areBitmasksEqual.booleanValue()));
 		
 		String c;
-		if (chosenBitmask == null || numberOfProcessors <= 0) {
+		if (chosenCpuBitmaskSizeInBits < 0 || numberOfProcessors <= 0) {
 			c = "NOT_AVAILABLE";
 		} else {
-			c = "sizeInBytes=" + chosenBitmask.sizeInBytes
-					+ " sizeInBits=" + chosenBitmask.sizeInBits;
+			c = String.valueOf(chosenCpuBitmaskSizeInBits) + " bits";
 		}
 		
-		System.out.println("chosenBitmaskSize: " + c);
+		System.out.println("chosenCpuBitmaskSize: " + c);
 		
 		String a;
-		if (chosenBitmask == null || numberOfProcessors <= 0) {
+		if (allowedCpuBitmask == null || numberOfProcessors <= 0) {
 			a = "NOT_AVAILABLE";
 		} else {
-			a = toString(chosenBitmask.cpuMask)
-					+ "-(" + toBinaryString(chosenBitmask.cpuMask) + ")"
-					+ " procs=" + arrayToString(getProcsFromBitmask(chosenBitmask.cpuMask, numberOfProcessors));
+			a = toString(allowedCpuBitmask)
+					+ "-(" + toBinaryString(allowedCpuBitmask) + ")"
+					+ " procs=" + arrayToString(getProcsFromBitmask(allowedCpuBitmask, numberOfProcessors));
 		}
 		
 		System.out.println("allowedCpusBitmask: " + a);
 	}
 	
-	private static String getSizeInBits(Bitmask[] bitmasks) {
+	private static String getSizeInBits(CpuBitmask[] bitmasks) {
 		StringBuilder sb = new StringBuilder();
-		for(Bitmask bm : bitmasks) {
+		for(CpuBitmask bm : bitmasks) {
 			if (sb.length() > 0) sb.append(",");
 			sb.append(bm.sizeInBits);
 		}
@@ -256,12 +260,16 @@ public class CpuInfo {
 		return isolcpus;
 	}
 	
-	public static Bitmask[] getBitmasks() {
-		return bitmasks;
+	public static CpuBitmask[] getCpuBitmasksFound() {
+		return cpuBitmasks;
 	}
 	
-	public static Bitmask getChosenBitmask() {
-		return chosenBitmask;
+	public static long[] getAllowedCpuBitmask() {
+		return allowedCpuBitmask;
+	}
+	
+	public static int getChosenCpuBitmaskSizeInBits() {
+		return chosenCpuBitmaskSizeInBits;
 	}
 	
 	public static boolean areBitmasksEqual() {
@@ -544,11 +552,11 @@ public class CpuInfo {
 		return toReturn;
 	}
 	
-	private static Bitmask[] scan(boolean verbose) {
+	private static CpuBitmask[] scan(boolean verbose) {
 		
 		final CLibrary lib = Affinity.getLib();
 		
-		List<Bitmask> bitmasks = new ArrayList<Bitmask>(Pointer.ALL.size());
+		List<CpuBitmask> bitmasks = new ArrayList<CpuBitmask>(Pointer.ALL.size());
 		
 		if (verbose) System.out.println(VERBOSE_PREFIX + "Will begin scan: thread=" + Thread.currentThread().getName());
 		
@@ -561,8 +569,7 @@ public class CpuInfo {
 				int ret = lib.sched_getaffinity(0, p.getSizeInBytes(), p);
 				
 				if (ret >= 0) {
-					Bitmask bm = new Bitmask();
-					bm.sizeInBytes = p.getSizeInBytes();
+					CpuBitmask bm = new CpuBitmask();
 					bm.cpuMask = p.getValue();
 					bm.sizeInBits = p.getSizeInBytes() * 8;
 					bitmasks.add(bm);
@@ -590,7 +597,7 @@ public class CpuInfo {
 		
 		if (bitmasks.isEmpty()) throw new RuntimeException("Could not find any bitmasks for the cpu!");
 		
-		Bitmask[] array = new Bitmask[bitmasks.size()];
+		CpuBitmask[] array = new CpuBitmask[bitmasks.size()];
 		return bitmasks.toArray(array);
 	}
 	
@@ -643,9 +650,9 @@ public class CpuInfo {
 		return true;
 	}
 	
-	private static boolean allEqual(Bitmask[] bitmasks) {
+	private static boolean allEqual(CpuBitmask[] bitmasks) {
 		long[] array = null;
-		for(Bitmask r : bitmasks) {
+		for(CpuBitmask r : bitmasks) {
 			if (array == null) {
 				array = r.cpuMask;
 			} else if (!equal(array, r.cpuMask)) {
