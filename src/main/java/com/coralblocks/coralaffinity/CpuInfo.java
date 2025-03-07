@@ -205,7 +205,7 @@ public class CpuInfo {
 					+ " procIds=" + arrayToString(nonIsolatedCpus);
 		}
 		
-		System.out.println("nonIsolatedCpusBitmask: " + a);
+		System.out.println("nonIsolatedCpuBitmask: " + a);
 		
 		String ic;
 		if (isolatedCpus == null || numberOfProcessors <= 0) {
@@ -221,7 +221,7 @@ public class CpuInfo {
 					+ " procIds=" + arrayToString(isolatedCpus);
 		}
 		
-		System.out.println("isolatedCpus: " + ic);
+		System.out.println("isolatedCpuBitmask: " + ic);
 	}
 	
 	private static String getSizeInBits(CpuBitmask[] bitmasks) {
