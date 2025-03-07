@@ -48,7 +48,7 @@ public class RotateThread {
 						+ Arrays.toString(procIds) 
 						+ " (" + (useIsolated ? "isolatedCpus" : "nonIsolatedCpus") + ")");
 		
-		if (procIds.length == 0) {
+		if (procIds == null || procIds.length == 0) {
 			System.out.println("Nothing to rotate, list of procIds is empty!");
 			return;
 		}
