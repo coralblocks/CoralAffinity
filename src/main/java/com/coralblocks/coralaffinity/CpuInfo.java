@@ -51,6 +51,8 @@ public class CpuInfo {
 	private static Boolean areCpuBitmasksEqual = null;
 	private static Boolean isHyperthreadingOn = null;
 	private static boolean isLinux = false;
+	private static boolean isVerbose = false;
+	private static boolean isPrintInfo = false;
 	
 	static {
 		final String isEnabledConfig = "coralAffinityEnabled";
@@ -66,7 +68,7 @@ public class CpuInfo {
 	}
 	
 	static {
-		boolean isVerbose = false;
+		isVerbose = false;
 		final String verboseConfig = "coralAffinityVerbose";
 		String s1 = System.getProperty(verboseConfig);
 		String s2 = System.getenv(verboseConfig);
@@ -80,16 +82,16 @@ public class CpuInfo {
 		CpuInfo.init(isVerbose);
 		if (isVerbose) System.out.println();
 		
-		boolean printInfo = false;
+		isPrintInfo = false;
 		final String printInfoConfig = "coralAffinityPrintInfo";
 		s1 = System.getProperty(printInfoConfig);
 		s2 = System.getenv(printInfoConfig);
 		if (s1 != null && s1.equalsIgnoreCase("true")) {
-			printInfo = true;
+			isPrintInfo = true;
 		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
-			printInfo = true;
+			isPrintInfo = true;
 		}
-		if (printInfo) {
+		if (isPrintInfo) {
 			if (!isVerbose) System.out.println();
 			CpuInfo.printInfo();
 			System.out.println();
@@ -708,10 +710,11 @@ public class CpuInfo {
 	
 	public static void main(String[] args) {
 		
-		System.out.println();
+		if (!isVerbose) System.out.println();
 		
-		CpuInfo.printInfo();
-		
-		System.out.println();
+		if (!isPrintInfo) {
+			CpuInfo.printInfo();
+			System.out.println();
+		}
 	}
 }
