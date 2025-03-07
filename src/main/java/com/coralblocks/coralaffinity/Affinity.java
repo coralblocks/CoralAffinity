@@ -121,8 +121,6 @@ public class Affinity {
 		schedResult = checkProcIds(procIds);
 		if (schedResult != null) return schedResult;
 		
-		final CLibrary lib = getLib();
-		
 		int sizeInBytes = CpuInfo.getChosenCpuBitmaskSizeInBits() / 8;
 		
 		Pointer pointer = Pointer.get(sizeInBytes);
@@ -139,6 +137,8 @@ public class Affinity {
 		pointer.set(cpuBitmask);
 		
 		try {
+			
+			final CLibrary lib = getLib();
 		
 			int retValue = lib.sched_setaffinity(0, sizeInBytes, pointer);
 			
