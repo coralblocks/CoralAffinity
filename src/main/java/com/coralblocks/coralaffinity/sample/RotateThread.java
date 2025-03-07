@@ -40,11 +40,17 @@ public class RotateThread {
 			}
 		}
 		
-		boolean useIsolatedCpus = args.length > 0 ? Boolean.parseBoolean(args[0]) : false;
+		boolean useIsolated = args.length > 0 ? Boolean.parseBoolean(args[0]) : false;
 		
-		int[] procIds = useIsolatedCpus ? CpuInfo.getIsolatedCpus() : CpuInfo.getNonIsolatedCpus();
+		int[] procIds = useIsolated ? CpuInfo.getIsolatedCpus() : CpuInfo.getNonIsolatedCpus();
 		
-		System.out.println("List of procIds to rotate => " + Arrays.toString(procIds));
+		System.out.println("List of procIds => " 
+						+ Arrays.toString(procIds) 
+						+ " (" + (useIsolated ? "isolatedCpus" : "nonIsolatedCpus") + ")");
+		
+		if (procIds.length == 0) {
+			System.out.println("Nothing to rotate, list of procIds is empty!");
+		}
 		
 		TestThread t = new TestThread("TestThread", procIds[0]);
 		t.start();
