@@ -53,6 +53,7 @@ public class CpuInfo {
 	private static boolean isLinux = false;
 	private static boolean isVerbose = false;
 	private static boolean isPrintInfo = false;
+	private static boolean isVerboseColors = true;
 	
 	static {
 		final String isEnabledConfig = "coralAffinityEnabled";
@@ -63,8 +64,18 @@ public class CpuInfo {
 		} else if (s2 != null && s2.equalsIgnoreCase("false")) {
 			isEnabled = false;
 		}
+		
 		String OS = System.getProperty("os.name").toLowerCase();
 		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
+		
+		final String isVerboseColorsConfig = "coralAffinityVerboseColors";
+		s1 = System.getProperty(isVerboseColorsConfig);
+		s2 = System.getenv(isVerboseColorsConfig);
+		if (s1 != null && s1.equalsIgnoreCase("false")) {
+			isVerboseColors = false;
+		} else if (s2 != null && s2.equalsIgnoreCase("false")) {
+			isVerboseColors = false;
+		}
 	}
 	
 	static {
@@ -669,11 +680,19 @@ public class CpuInfo {
 	}
 	
 	private static void printlnGreen(String s) {
-		System.out.println(ANSI_GREEN + s + ANSI_RESET);
+		if (isVerboseColors) {
+			System.out.println(ANSI_GREEN + s + ANSI_RESET);
+		} else {
+			System.out.println(s);
+		}
 	}
 	
 	private static void printlnRed(String s) {
-		System.out.println(ANSI_RED + s + ANSI_RESET);
+		if (isVerboseColors) {
+			System.out.println(ANSI_RED + s + ANSI_RESET);
+		} else {
+			System.out.println(s);
+		}
 	}
 	
 	private static String toString(long[] value) {
