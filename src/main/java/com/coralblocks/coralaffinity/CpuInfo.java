@@ -455,7 +455,7 @@ public class CpuInfo {
 		return getCpuBitmaskFromProcIds(numberOfProcessorsHolder, procIds);
 	}
 	
-	private static void ensureValidBits(int[] procIds, int numberOfProcessors) {
+	private static void ensureValidProcIds(int[] procIds, int numberOfProcessors) {
 		for(int i : procIds) {
 			if (i < 0 || i >= numberOfProcessors) {
 				throw new IllegalArgumentException("Invalid procId! procId=" + i + " numberOfProcessors=" + numberOfProcessors);
@@ -484,7 +484,7 @@ public class CpuInfo {
 		
 		final int numberOfProcessors = numberOfProcessorsHolder.getValue();
 		
-		ensureValidBits(procIds, numberOfProcessors);
+		ensureValidProcIds(procIds, numberOfProcessors);
 		
 		int numberOfLongs = (numberOfProcessors - 1) / 64 + 1;
 		
