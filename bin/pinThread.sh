@@ -1,4 +1,6 @@
 #!/bin/bash
 
-java -cp target/coralaffinity-all.jar com.coralblocks.coralaffinity.sample.PinThread $1
+VERBOSE=${2:-false}
+
+java -DcoralAffinityVerbose=$VERBOSE -cp target/coralaffinity-all.jar com.coralblocks.coralaffinity.sample.PinThread $1
 
