@@ -55,53 +55,37 @@ public class CpuInfo {
 	private static boolean isPrintInfo = false;
 	private static boolean isVerboseColors = true;
 	
-	static {
-		final String isEnabledConfig = "coralAffinityEnabled";
-		String s1 = System.getProperty(isEnabledConfig);
-		String s2 = System.getenv(isEnabledConfig);
-		if (s1 != null && s1.equalsIgnoreCase("false")) {
-			isEnabled = false;
-		} else if (s2 != null && s2.equalsIgnoreCase("false")) {
-			isEnabled = false;
-		}
-		
-		String OS = System.getProperty("os.name").toLowerCase();
-		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
-		
-		final String isVerboseColorsConfig = "coralAffinityVerboseColors";
-		s1 = System.getProperty(isVerboseColorsConfig);
-		s2 = System.getenv(isVerboseColorsConfig);
-		if (s1 != null && s1.equalsIgnoreCase("false")) {
-			isVerboseColors = false;
-		} else if (s2 != null && s2.equalsIgnoreCase("false")) {
-			isVerboseColors = false;
+	private static boolean getBooleanConfig(String configName, boolean defValue) {
+		String s1 = System.getProperty(configName);
+		String s2 = System.getenv(configName);
+		if (s1 != null) {
+			return Boolean.parseBoolean(s1);
+		} else if (s2 != null) {
+			return Boolean.parseBoolean(s2);
+		} else {
+			return defValue;
 		}
 	}
 	
 	static {
-		isVerbose = false;
-		final String verboseConfig = "coralAffinityVerbose";
-		String s1 = System.getProperty(verboseConfig);
-		String s2 = System.getenv(verboseConfig);
-		if (s1 != null && s1.equalsIgnoreCase("true")) {
-			isVerbose = true;
-		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
-			isVerbose = true;
-		}
+		isEnabled = getBooleanConfig("coralAffinityEnabled", isEnabled);
+		
+		String OS = System.getProperty("os.name").toLowerCase();
+		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
+		
+		isVerboseColors = getBooleanConfig("coralAffinityVerboseColors", isVerboseColors);
+	}
+	
+	static {
+		
+		isVerbose = getBooleanConfig("coralAffinityVerbose", isVerbose);
 		
 		if (isVerbose) System.out.println();
 		CpuInfo.init(isVerbose);
 		if (isVerbose) System.out.println();
 		
-		isPrintInfo = false;
-		final String printInfoConfig = "coralAffinityPrintInfo";
-		s1 = System.getProperty(printInfoConfig);
-		s2 = System.getenv(printInfoConfig);
-		if (s1 != null && s1.equalsIgnoreCase("true")) {
-			isPrintInfo = true;
-		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
-			isPrintInfo = true;
-		}
+		isPrintInfo = getBooleanConfig("coralAffinityPrintInfo", isPrintInfo);
+		
 		if (isPrintInfo) {
 			if (!isVerbose) System.out.println();
 			CpuInfo.printInfo();
