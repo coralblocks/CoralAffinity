@@ -50,6 +50,7 @@ public class RotateThread {
 		
 		if (procIds.length == 0) {
 			System.out.println("Nothing to rotate, list of procIds is empty!");
+			return;
 		}
 		
 		TestThread t = new TestThread("TestThread", procIds[0]);
