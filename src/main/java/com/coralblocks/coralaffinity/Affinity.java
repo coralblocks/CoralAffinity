@@ -12,7 +12,7 @@ public class Affinity {
 	
 	public static class SchedResult {
 		
-		public static enum Status { OK, NOT_LINUX, NOT_AVAILABLE, NOT_ENABLED, RET_VALUE_NEGATIVE, EXCEPTION }
+		public static enum Status { OK, NOT_LINUX, NOT_AVAILABLE, NOT_ENABLED, RET_VALUE_NEGATIVE, EXCEPTION, BAD_ARGUMENT }
 		
 		private final Status status;
 		private final Throwable exception;
@@ -38,6 +38,18 @@ public class Affinity {
 		public Throwable getException() {
 			return exception;
 		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("SchedResult [status=").append(status);
+			if (status == Status.EXCEPTION) {
+				sb.append(", exception=\"").append(exception.getMessage()).append("\"]");
+			} else {
+				sb.append("]");
+			}
+			return sb.toString();
+		}
 	}
 	
 	private static final SchedResult SCHED_RESULT_OK = new SchedResult(SchedResult.Status.OK);
@@ -45,6 +57,7 @@ public class Affinity {
 	private static final SchedResult SCHED_RESULT_NOT_AVAILABLE = new SchedResult(SchedResult.Status.NOT_AVAILABLE);
 	private static final SchedResult SCHED_RESULT_NOT_ENABLED = new SchedResult(SchedResult.Status.NOT_ENABLED);
 	private static final SchedResult SCHED_RESULT_RET_VALUE_NEGATIVE = new SchedResult(SchedResult.Status.RET_VALUE_NEGATIVE);
+	private static final SchedResult SCHED_RESULT_BAD_ARGUMENT = new SchedResult(SchedResult.Status.BAD_ARGUMENT);
 	
 	private Affinity() {
 		
@@ -62,6 +75,19 @@ public class Affinity {
 		
 		if (!CpuInfo.isAvailable()) {
 			return SCHED_RESULT_NOT_AVAILABLE;
+		}
+		
+		return null;
+	}
+	
+	private static SchedResult checkProcIds(int[] procIds) {
+		
+		if (procIds == null || procIds.length == 0) return SCHED_RESULT_BAD_ARGUMENT;
+		
+		for(int i : procIds) {
+			if (i < 0 || i >= CpuInfo.getNumberOfProcessors()) {
+				return SCHED_RESULT_BAD_ARGUMENT;
+			}
 		}
 		
 		return null;
@@ -90,6 +116,9 @@ public class Affinity {
 	public synchronized static final SchedResult set(int ... procIds) {
 		
 		SchedResult schedResult = check();
+		if (schedResult != null) return schedResult;
+		
+		schedResult = checkProcIds(procIds);
 		if (schedResult != null) return schedResult;
 		
 		final CLibrary lib = getLib();
