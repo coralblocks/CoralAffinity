@@ -103,19 +103,19 @@ public class Affinity {
 		SchedResult schedResult = check();
 		if (schedResult != null) return schedResult;
 		
-		int[] isolcpus = CpuInfo.getIsolcpus();
+		int[] isolcpus = CpuInfo.getIsolatedCpus();
 		
 		return set(isolcpus);
 	}
 	
-	public synchronized static final SchedResult setAllowedCpus() {
+	public synchronized static final SchedResult setNonIsolatedCpus() {
 		
 		SchedResult schedResult = check();
 		if (schedResult != null) return schedResult;
 		
-		int[] allowedCpus = CpuInfo.getAllowedCpus();
+		int[] nonIsolatedCpus = CpuInfo.getNonIsolatedCpus();
 		
-		return set(allowedCpus);
+		return set(nonIsolatedCpus);
 	}
 	
 	public synchronized static final SchedResult set(int ... procIds) {

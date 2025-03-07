@@ -44,10 +44,10 @@ public class CpuInfo {
 	private static IntHolder numberOfProcessorsHolder = null;
 	private static boolean isEnabled = true;
 	private static Boolean isAvailable = null;
-	private static int[] isolcpus = null;
+	private static int[] isolatedCpus = null;
 	private static CpuBitmask[] cpuBitmasks = null;
 	private static int chosenCpuBitmaskSizeInBits = -1;
-	private static int[] allowedCpus = null;
+	private static int[] nonIsolatedCpus = null;
 	private static Boolean areCpuBitmasksEqual = null;
 	private static Boolean isHyperthreadingOn = null;
 	private static boolean isLinux = false;
@@ -92,8 +92,8 @@ public class CpuInfo {
 			isHyperthreadingOn = isHyperthreadingOn(verbose);
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Is hyperthreading on: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 			
-			isolcpus = getIsolcpusNumbers(readProcCmdline());
-			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolcpus != null ? arrayToString(isolcpus) : "NOT_DEFINED"));
+			isolatedCpus = getIsolcpusProcIds(readProcCmdline());
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Isolcpus: " + (isolatedCpus != null ? arrayToString(isolatedCpus) : "NOT_DEFINED"));
 			
 			cpuBitmasks = scan(verbose);
 			
@@ -133,12 +133,12 @@ public class CpuInfo {
 			}
 			
 			chosenCpuBitmaskSizeInBits = chosenBitmask.sizeInBits;
-			allowedCpus = getProcIdsFromCpuBitmask(numberOfProcessorsHolder, chosenBitmask.cpuMask);
+			nonIsolatedCpus = getProcIdsFromCpuBitmask(numberOfProcessorsHolder, chosenBitmask.cpuMask);
 			
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBits=" + chosenBitmask.sizeInBits
 					+ " cpuMask=" + toString(chosenBitmask.cpuMask)
 					+ "-(" + toBinaryString(chosenBitmask.cpuMask) + ")"
-					+ " procIds=" + arrayToString(allowedCpus));
+					+ " procIds=" + arrayToString(nonIsolatedCpus));
 		}
 		
 		isInitialized = true;
@@ -166,15 +166,15 @@ public class CpuInfo {
 		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 		
 		String ic;
-		if (isolcpus == null || numberOfProcessors <= 0) {
+		if (isolatedCpus == null || numberOfProcessors <= 0) {
 			ic = "NOT_AVAILABLE";
-		} else if (isolcpus.length == 0) {
+		} else if (isolatedCpus.length == 0) {
 			ic = "NOT_DEFINED";
 		} else {
-			ic = arrayToString(isolcpus);
+			ic = arrayToString(isolatedCpus);
 		}
 		
-		System.out.println("isolcpus: " + ic);
+		System.out.println("isolatedCpus: " + ic);
 		
 		String r;
 		if (cpuBitmasks == null) {
@@ -205,18 +205,18 @@ public class CpuInfo {
 		System.out.println("chosenCpuBitmaskSize: " + c);
 		
 		String a;
-		if (allowedCpus == null || numberOfProcessors <= 0) {
+		if (nonIsolatedCpus == null || numberOfProcessors <= 0) {
 			a = "NOT_AVAILABLE";
 		} else {
 			
-			long[] allowedCpuBitmask = getCpuBitmaskFromProcIds(numberOfProcessorsHolder, allowedCpus);
+			long[] nonIsolatedCpuBitmask = getCpuBitmaskFromProcIds(numberOfProcessorsHolder, nonIsolatedCpus);
 			
-			a = toString(allowedCpuBitmask)
-					+ " (" + toBinaryString(allowedCpuBitmask) + ")"
-					+ " procIds=" + arrayToString(allowedCpus);
+			a = toString(nonIsolatedCpuBitmask)
+					+ " (" + toBinaryString(nonIsolatedCpuBitmask) + ")"
+					+ " procIds=" + arrayToString(nonIsolatedCpus);
 		}
 		
-		System.out.println("allowedCpusBitmask: " + a);
+		System.out.println("nonIsolatedCpusBitmask: " + a);
 	}
 	
 	private static String getSizeInBits(CpuBitmask[] bitmasks) {
@@ -288,12 +288,12 @@ public class CpuInfo {
 		return numberOfProcessors;
 	}
 	
-	public static int[] getIsolcpus() {
-		return isolcpus;
+	public static int[] getIsolatedCpus() {
+		return isolatedCpus;
 	}
 	
-	public static int[] getAllowedCpus() {
-		return allowedCpus;
+	public static int[] getNonIsolatedCpus() {
+		return nonIsolatedCpus;
 	}
 	
 	public static int getChosenCpuBitmaskSizeInBits() {
@@ -343,7 +343,7 @@ public class CpuInfo {
 		}
 	}
 	
-	private static int[] getIsolcpusNumbers(final String cmdline) {
+	private static int[] getIsolcpusProcIds(final String cmdline) {
 		
         Pattern pattern = Pattern.compile("\\bisolcpus=([^\\s]+)");
         Matcher matcher = pattern.matcher(cmdline);
