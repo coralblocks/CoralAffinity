@@ -2,5 +2,9 @@
 
 VERBOSE=${1:-false}
 
-java -cp target/coralaffinity-all.jar com.coralblocks.coralaffinity.CpuInfo $VERBOSE
+CMD="java -cp target/coralaffinity-all.jar com.coralblocks.coralaffinity.CpuInfo $VERBOSE"
+
+echo $CMD
+
+$CMD
 
