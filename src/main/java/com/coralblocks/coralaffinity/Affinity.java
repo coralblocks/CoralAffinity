@@ -31,6 +31,10 @@ public class Affinity {
 			this.exception = exception;
 		}
 		
+		public boolean isOk() {
+			return status == Status.OK;
+		}
+		
 		public Status getStatus() {
 			return status;
 		}
@@ -42,7 +46,7 @@ public class Affinity {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			sb.append("SchedResult [status=").append(status);
+			sb.append("[status=").append(status);
 			if (status == Status.EXCEPTION) {
 				sb.append(", exception=\"").append(exception.getMessage()).append("\"]");
 			} else {
