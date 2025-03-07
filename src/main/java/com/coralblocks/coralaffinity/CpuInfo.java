@@ -697,12 +697,6 @@ public class CpuInfo {
 	
 	public static void main(String[] args) {
 		
-		final boolean verbose = args.length > 0 ? Boolean.parseBoolean(args[0]) : true;
-		
-		if (verbose) System.out.println();
-		
-		CpuInfo.init(verbose);
-		
 		System.out.println();
 		
 		CpuInfo.printInfo();
