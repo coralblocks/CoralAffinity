@@ -165,17 +165,6 @@ public class CpuInfo {
 		
 		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 		
-		String ic;
-		if (isolatedCpus == null || numberOfProcessors <= 0) {
-			ic = "NOT_AVAILABLE";
-		} else if (isolatedCpus.length == 0) {
-			ic = "NOT_DEFINED";
-		} else {
-			ic = arrayToString(isolatedCpus);
-		}
-		
-		System.out.println("isolatedCpus: " + ic);
-		
 		String r;
 		if (cpuBitmasks == null) {
 			r = "NOT_AVAILABLE";
@@ -217,6 +206,22 @@ public class CpuInfo {
 		}
 		
 		System.out.println("nonIsolatedCpusBitmask: " + a);
+		
+		String ic;
+		if (isolatedCpus == null || numberOfProcessors <= 0) {
+			ic = "NOT_AVAILABLE";
+		} else if (isolatedCpus.length == 0) {
+			ic = "NOT_DEFINED";
+		} else {
+			
+			long[] isolatedCpuBitmask = getCpuBitmaskFromProcIds(numberOfProcessorsHolder, isolatedCpus);
+			
+			ic = toString(isolatedCpuBitmask)
+					+ " (" + toBinaryString(isolatedCpuBitmask) + ")"
+					+ " procIds=" + arrayToString(isolatedCpus);
+		}
+		
+		System.out.println("isolatedCpus: " + ic);
 	}
 	
 	private static String getSizeInBits(CpuBitmask[] bitmasks) {
