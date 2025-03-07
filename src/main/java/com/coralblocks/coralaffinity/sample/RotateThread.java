@@ -1,5 +1,7 @@
 package com.coralblocks.coralaffinity.sample;
 
+import java.util.Arrays;
+
 import com.coralblocks.coralaffinity.Affinity;
 import com.coralblocks.coralaffinity.CpuInfo;
 
@@ -42,12 +44,14 @@ public class RotateThread {
 		
 		int[] procIds = useIsolatedCpus ? CpuInfo.getIsolatedCpus() : CpuInfo.getNonIsolatedCpus();
 		
+		System.out.println("List of procIds to rotate => " + Arrays.toString(procIds));
+		
 		TestThread t = new TestThread("TestThread", procIds[0]);
 		t.start();
 		
 		for(int i = 1; i < procIds.length; i++) {
 			
-			Thread.sleep(5000);
+			Thread.sleep(10000);
 		
 			int procId = procIds[i];
 			
