@@ -45,14 +45,13 @@ public class Affinity {
 
 		@Override
 		public String toString() {
-			StringBuilder sb = new StringBuilder();
-			sb.append("[status=").append(status);
 			if (status == Status.EXCEPTION) {
-				sb.append(", exception=\"").append(exception.getMessage()).append("\"]");
+				StringBuilder sb = new StringBuilder();
+				sb.append("EXCEPTION=\"").append(exception.getMessage()).append("\"");
+				return sb.toString();
 			} else {
-				sb.append("]");
+				return status.toString();
 			}
-			return sb.toString();
 		}
 	}
 	
