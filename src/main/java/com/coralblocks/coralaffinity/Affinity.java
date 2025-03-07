@@ -10,26 +10,6 @@ import com.sun.jna.PointerType;
 
 public class Affinity {
 	
-	static {
-		boolean isVerbose = false;
-		final String verboseConfig = "coralAffinityVerbose";
-		String s1 = System.getProperty(verboseConfig);
-		String s2 = System.getenv(verboseConfig);
-		if (s1 != null && s1.equalsIgnoreCase("true")) {
-			isVerbose = true;
-		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
-			isVerbose = true;
-		}
-		
-		if (isVerbose) System.out.println();
-		CpuInfo.init(isVerbose);
-		if (isVerbose) {
-			System.out.println();
-			CpuInfo.printInfo();
-			System.out.println();
-		}
-	}
-	
 	public static class SchedResult {
 		
 		public static enum Status { OK, NOT_LINUX, NOT_ENABLED, NOT_INITIALIZED, NOT_AVAILABLE, RET_VALUE_NEGATIVE, EXCEPTION, BAD_ARGUMENT }
