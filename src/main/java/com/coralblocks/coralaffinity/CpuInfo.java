@@ -16,26 +16,6 @@ import com.coralblocks.coralaffinity.pointer.Pointer;
 
 public class CpuInfo {
 	
-	static {
-		boolean isVerbose = false;
-		final String verboseConfig = "coralAffinityVerbose";
-		String s1 = System.getProperty(verboseConfig);
-		String s2 = System.getenv(verboseConfig);
-		if (s1 != null && s1.equalsIgnoreCase("true")) {
-			isVerbose = true;
-		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
-			isVerbose = true;
-		}
-		
-		if (isVerbose) System.out.println();
-		CpuInfo.init(isVerbose);
-		if (isVerbose) {
-			System.out.println();
-			CpuInfo.printInfo();
-			System.out.println();
-		}
-	}
-	
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_RED = "\u001B[31m";
     private static final String ANSI_GREEN = "\u001B[32m";
@@ -83,6 +63,26 @@ public class CpuInfo {
 		}
 		String OS = System.getProperty("os.name").toLowerCase();
 		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
+	}
+	
+	static {
+		boolean isVerbose = false;
+		final String verboseConfig = "coralAffinityVerbose";
+		String s1 = System.getProperty(verboseConfig);
+		String s2 = System.getenv(verboseConfig);
+		if (s1 != null && s1.equalsIgnoreCase("true")) {
+			isVerbose = true;
+		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
+			isVerbose = true;
+		}
+		
+		if (isVerbose) System.out.println();
+		CpuInfo.init(isVerbose);
+		if (isVerbose) {
+			System.out.println();
+			CpuInfo.printInfo();
+			System.out.println();
+		}
 	}
 	
 	private CpuInfo() {
