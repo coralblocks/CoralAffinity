@@ -15,10 +15,10 @@ public class Affinity {
 		final String verboseConfig = "coralAffinityVerbose";
 		String s1 = System.getProperty(verboseConfig);
 		String s2 = System.getenv(verboseConfig);
-		if (s1 != null && s1.equalsIgnoreCase("false")) {
-			isVerbose = false;
-		} else if (s2 != null && s2.equalsIgnoreCase("false")) {
-			isVerbose = false;
+		if (s1 != null && s1.equalsIgnoreCase("true")) {
+			isVerbose = true;
+		} else if (s2 != null && s2.equalsIgnoreCase("true")) {
+			isVerbose = true;
 		}
 		
 		if (isVerbose) System.out.println();
