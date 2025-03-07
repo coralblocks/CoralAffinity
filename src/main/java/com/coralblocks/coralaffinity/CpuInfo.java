@@ -117,7 +117,7 @@ public class CpuInfo {
 						printlnGreen(VERBOSE_PREFIX + "sizeInBits: " + r.sizeInBits
 							+ " => cpuMask: " + toString(r.cpuMask)
 							+ " (" + toBinaryString(r.cpuMask) + ")"
-							+ " procs=" + arrayToString(getProcIdsFromCpuBitmask(numberOfProcessorsHolder, r.cpuMask)));
+							+ " procIds=" + arrayToString(getProcIdsFromCpuBitmask(numberOfProcessorsHolder, r.cpuMask)));
 					}
 					
 					System.out.println();
@@ -138,7 +138,7 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBits=" + chosenBitmask.sizeInBits
 					+ " cpuMask=" + toString(chosenBitmask.cpuMask)
 					+ "-(" + toBinaryString(chosenBitmask.cpuMask) + ")"
-					+ " procs=" + arrayToString(allowedCpus));
+					+ " procIds=" + arrayToString(allowedCpus));
 		}
 		
 		isInitialized = true;
@@ -213,7 +213,7 @@ public class CpuInfo {
 			
 			a = toString(allowedCpuBitmask)
 					+ " (" + toBinaryString(allowedCpuBitmask) + ")"
-					+ " procs=" + arrayToString(allowedCpus);
+					+ " procIds=" + arrayToString(allowedCpus);
 		}
 		
 		System.out.println("allowedCpusBitmask: " + a);
@@ -548,10 +548,10 @@ public class CpuInfo {
 				sizeInBits = remainingBits;
 			}
 			
-			int[] procs = getSetBitPositions(bm, sizeInBits);
+			int[] procIds = getSetBitPositions(bm, sizeInBits);
 			
 			int toAdd = i * 64;
-			for(int proc : procs) {
+			for(int proc : procIds) {
 				list.add(proc + toAdd);
 			}
 
@@ -658,13 +658,13 @@ public class CpuInfo {
 	}
 	
 	private static boolean allEqual(CpuBitmask[] bitmasks) {
-		int[] procs = null;
+		int[] procIds = null;
 		for(CpuBitmask r : bitmasks) {
-			if (procs == null) {
-				procs = getProcIdsFromCpuBitmask(new IntHolder(r.sizeInBits), r.cpuMask);
+			if (procIds == null) {
+				procIds = getProcIdsFromCpuBitmask(new IntHolder(r.sizeInBits), r.cpuMask);
 			} else {
 				int[] other = getProcIdsFromCpuBitmask(new IntHolder(r.sizeInBits), r.cpuMask);
-				if (!Arrays.equals(other, procs)) return false;
+				if (!Arrays.equals(other, procIds)) return false;
 			}
 		}
 		return true;
