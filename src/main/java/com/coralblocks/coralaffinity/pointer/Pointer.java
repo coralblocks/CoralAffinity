@@ -40,7 +40,7 @@ public abstract class Pointer extends ByReference implements CpuMask {
 	    return result;
 	}
 	
-	protected void set(long ... l) {
+	public void set(long ... l) {
 		byte[] bytes = extractBytes(l, sizeInBytes);
 		int index = 0;
 		for(byte b : bytes) {
@@ -63,6 +63,13 @@ public abstract class Pointer extends ByReference implements CpuMask {
 	}
 	
 	public static final List<Pointer> ALL = new ArrayList<Pointer>(32);
+	
+	public static final Pointer get(int sizeInBytes) {
+		for(Pointer p : ALL) {
+			if (p.getSizeInBytes() == sizeInBytes) return p;
+		}
+		return null;
+	}
 	
 	static {
 		ALL.add(new _8BitsPointer());

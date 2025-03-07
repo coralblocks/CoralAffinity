@@ -47,9 +47,10 @@ public class CpuInfo {
 	private static int[] isolcpus = null;
 	private static CpuBitmask[] cpuBitmasks = null;
 	private static int chosenCpuBitmaskSizeInBits = -1;
-	private static long[] allowedCpuBitmask = null;
+	private static int[] allowedCpus = null;
 	private static Boolean areCpuBitmasksEqual = null;
 	private static Boolean isHyperthreadingOn = null;
+	private static boolean isLinux = false;
 	
 	static {
 		final String isEnabledConfig = "coralAffinityEnabled";
@@ -60,6 +61,8 @@ public class CpuInfo {
 		} else if (s2 != null && s2.equalsIgnoreCase("false")) {
 			isEnabled = false;
 		}
+		String OS = System.getProperty("os.name").toLowerCase();
+		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
 	}
 	
 	private CpuInfo() {
@@ -130,12 +133,12 @@ public class CpuInfo {
 			}
 			
 			chosenCpuBitmaskSizeInBits = chosenBitmask.sizeInBits;
-			allowedCpuBitmask = chosenBitmask.cpuMask;
+			allowedCpus = getProcIdsFromCpuBitmask(numberOfProcessorsHolder, chosenBitmask.cpuMask);
 			
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBits=" + chosenBitmask.sizeInBits
 					+ " cpuMask=" + toString(chosenBitmask.cpuMask)
 					+ "-(" + toBinaryString(chosenBitmask.cpuMask) + ")"
-					+ " procs=" + arrayToString(getProcIdsFromCpuBitmask(numberOfProcessorsHolder, chosenBitmask.cpuMask)));
+					+ " procs=" + arrayToString(allowedCpus));
 		}
 		
 		isInitialized = true;
@@ -202,12 +205,15 @@ public class CpuInfo {
 		System.out.println("chosenCpuBitmaskSize: " + c);
 		
 		String a;
-		if (allowedCpuBitmask == null || numberOfProcessors <= 0) {
+		if (allowedCpus == null || numberOfProcessors <= 0) {
 			a = "NOT_AVAILABLE";
 		} else {
+			
+			long[] allowedCpuBitmask = getCpuBitmaskFromProcIds(numberOfProcessorsHolder, allowedCpus);
+			
 			a = toString(allowedCpuBitmask)
 					+ " (" + toBinaryString(allowedCpuBitmask) + ")"
-					+ " procs=" + arrayToString(getProcIdsFromCpuBitmask(numberOfProcessorsHolder, allowedCpuBitmask));
+					+ " procs=" + arrayToString(allowedCpus);
 		}
 		
 		System.out.println("allowedCpusBitmask: " + a);
@@ -226,8 +232,6 @@ public class CpuInfo {
 		
 		if (isAvailable == null) {
 			
-			String OS = System.getProperty("os.name").toLowerCase();
-			boolean isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
 			if (!isLinux) {
 				if (verbose) System.out.println(VERBOSE_PREFIX + "CoralAffinity is only available on Linux!");
 				isAvailable = false;
@@ -264,6 +268,10 @@ public class CpuInfo {
 		return isAvailable;
 	}
 	
+	static boolean isLinux() {
+		return isLinux;
+	}
+	
 	public static boolean isAvailable() {
 		return isAvailable(false);
 	}
@@ -284,8 +292,8 @@ public class CpuInfo {
 		return isolcpus;
 	}
 	
-	public static long[] getAllowedCpuBitmask() {
-		return allowedCpuBitmask;
+	public static int[] getAllowedCpus() {
+		return allowedCpus;
 	}
 	
 	public static int getChosenCpuBitmaskSizeInBits() {
