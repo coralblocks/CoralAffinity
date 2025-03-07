@@ -12,7 +12,7 @@ public class Affinity {
 	
 	public static class SchedResult {
 		
-		public static enum Status { OK, NOT_LINUX, NOT_AVAILABLE, NOT_ENABLED, RET_VALUE_NEGATIVE, EXCEPTION, BAD_ARGUMENT }
+		public static enum Status { OK, NOT_LINUX, NOT_ENABLED, NOT_INITIALIZED, NOT_AVAILABLE, RET_VALUE_NEGATIVE, EXCEPTION, BAD_ARGUMENT }
 		
 		private final Status status;
 		private final Throwable exception;
@@ -58,6 +58,7 @@ public class Affinity {
 	private static final SchedResult SCHED_RESULT_NOT_ENABLED = new SchedResult(SchedResult.Status.NOT_ENABLED);
 	private static final SchedResult SCHED_RESULT_RET_VALUE_NEGATIVE = new SchedResult(SchedResult.Status.RET_VALUE_NEGATIVE);
 	private static final SchedResult SCHED_RESULT_BAD_ARGUMENT = new SchedResult(SchedResult.Status.BAD_ARGUMENT);
+	private static final SchedResult SCHED_RESULT_NOT_INITIALIZED = new SchedResult(SchedResult.Status.NOT_INITIALIZED);
 	
 	private Affinity() {
 		
@@ -71,6 +72,10 @@ public class Affinity {
 		
 		if (!CpuInfo.isEnabled()) {
 			return SCHED_RESULT_NOT_ENABLED;
+		}
+		
+		if (!CpuInfo.isInitialized()) {
+			return SCHED_RESULT_NOT_INITIALIZED;
 		}
 		
 		if (!CpuInfo.isAvailable()) {
