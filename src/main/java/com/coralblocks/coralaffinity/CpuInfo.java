@@ -78,6 +78,7 @@ public class CpuInfo {
 		
 		if (isVerbose) System.out.println();
 		CpuInfo.init(isVerbose);
+		if (isVerbose) System.out.println();
 		
 		boolean printInfo = false;
 		final String printInfoConfig = "coralAffinityPrintInfo";
@@ -89,7 +90,7 @@ public class CpuInfo {
 			printInfo = true;
 		}
 		if (printInfo) {
-			if (isVerbose) System.out.println();
+			if (!isVerbose) System.out.println();
 			CpuInfo.printInfo();
 			System.out.println();
 		}
