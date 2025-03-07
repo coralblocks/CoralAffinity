@@ -333,13 +333,6 @@ public class CpuInfo {
 		return chosenCpuBitmaskSizeInBits;
 	}
 	
-	public static boolean areCpuBitmasksEqual() {
-		if (areCpuBitmasksEqual != null) {
-			return areCpuBitmasksEqual.booleanValue();
-		}
-		return false;
-	}
-	
 	public static boolean isHyperthreadingOn() {
 		if (isHyperthreadingOn != null) {
 			return isHyperthreadingOn.booleanValue();
