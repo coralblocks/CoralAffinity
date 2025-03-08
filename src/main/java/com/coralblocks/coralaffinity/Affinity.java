@@ -101,17 +101,7 @@ public class Affinity {
 		return null;
 	}
 	
-	public synchronized static final SchedResult setIsolatedCpus() {
-		
-		SchedResult schedResult = check();
-		if (schedResult != null) return schedResult;
-		
-		int[] isolcpus = CpuInfo.getIsolatedCpus();
-		
-		return set(isolcpus);
-	}
-	
-	public synchronized static final SchedResult setNonIsolatedCpus() {
+	public synchronized static final SchedResult setSchedulableCpus() {
 		
 		SchedResult schedResult = check();
 		if (schedResult != null) return schedResult;

@@ -9,7 +9,10 @@ import com.coralblocks.coralaffinity.Affinity;
  * 
  * This sample illustrates how you can pin to a single CPU processor (a single int) or to multiple ones (an int array).
  * 
- * When pinning a thread to multiple CPU processors, the kernel will decide to which one the thread ends up going.
+ * When pinning a thread to multiple CPU processors, the kernel scheduler will decide to which one the thread ends up going.
+ * 
+ * It is important to note that if you only pass isolated CPU processors (through the <i>isolcpus</i> Linux configuration) as procIds,
+ * the kernel scheduler will not schedule anything and assign all threads to the first (smallest) processor id in the list.
  */
 public class PinMultipleThreads {
 	
