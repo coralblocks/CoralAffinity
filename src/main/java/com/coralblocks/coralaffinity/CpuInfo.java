@@ -97,11 +97,7 @@ public class CpuInfo {
 		
 	}
 	
-	public static boolean init() {
-		return init(false);
-	}
-	
-	public synchronized static boolean init(boolean verbose) {
+	private synchronized static boolean init(boolean verbose) {
 		
 		if (isInitialized) {
 			return isAvailable(false);
