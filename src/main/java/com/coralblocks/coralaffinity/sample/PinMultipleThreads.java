@@ -1,5 +1,7 @@
 package com.coralblocks.coralaffinity.sample;
 
+import java.util.Arrays;
+
 import com.coralblocks.coralaffinity.Affinity;
 
 /**
@@ -16,6 +18,8 @@ public class PinMultipleThreads {
 		int numberOfThreads = Integer.parseInt(args[0]);
 		
 		final int[] procIds = parseIntArray(args[1]); // one procId or multiple ones
+		
+		System.out.println("Creating " + numberOfThreads + " threads... procIds=" + Arrays.toString(procIds));
 		
 		Thread[] t = new Thread[numberOfThreads];
 		
@@ -36,6 +40,8 @@ public class PinMultipleThreads {
 	            }
 				
 			}, "TestThread" + i);
+			
+			System.out.println("Starting thread " + i + "...");
 			
 			t[i].start();
 		}
