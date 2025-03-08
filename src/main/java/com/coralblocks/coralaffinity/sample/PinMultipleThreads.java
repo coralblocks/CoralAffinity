@@ -7,12 +7,16 @@ import com.coralblocks.coralaffinity.Affinity;
 /**
  * Pin some threads to a set of CPU processors.
  * 
- * This sample illustrates how you can pin to a single CPU processor (a single int) or to multiple ones (an int array).
+ * <p>This sample illustrates how you can pin to a single CPU processor (a single int) or to multiple ones (an int array).</p>
  * 
- * When pinning a thread to multiple CPU processors, the kernel scheduler will decide to which one the thread ends up going.
+ * <p>When pinning a thread to multiple CPU processors, the kernel scheduler will decide to which one the thread ends up going.</p>
  * 
- * It is important to note that if you only pass isolated CPU processors (through the <i>isolcpus</i> Linux configuration) as procIds,
- * the kernel scheduler will not schedule anything and assign all threads to the first (smallest) processor id in the list.
+ * <p>It is interesting to note that if you only pass isolated CPU processors (defined through the <i>isolcpus</i> Linux configuration)
+ * as procIds, the kernel scheduler will not schedule anything and assign all threads to the first (smallest) processor id in the list.</p>
+ * 
+ * <p>It is also interesting to note that if you pass schedulable (i.e. non-isolated) CPU processors together with isolated CPU processors,
+ * the kernel scheduler will ignore the isolated ones and only schedule the threads to run on the schedulable (i.e. non-isolated) CPU processors,
+ * ignoring the isolated ones in the list.</p>
  */
 public class PinMultipleThreads {
 	
