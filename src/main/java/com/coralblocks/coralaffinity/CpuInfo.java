@@ -223,7 +223,7 @@ public class CpuInfo {
 	            sb.append(i);
 	        }
 			
-			n = String.valueOf(numberOfProcessors) + " procIds=" + sb.toString();
+			n = String.valueOf(numberOfProcessors) + " => procIds=" + sb.toString();
 		}
 		
 		System.out.println("numberOfProcessors: " + n);
@@ -250,7 +250,7 @@ public class CpuInfo {
 			
 			a = toString(nonIsolatedCpuBitmask)
 					+ " (" + toBinaryString(nonIsolatedCpuBitmask) + ")"
-					+ " procIds=" + arrayToString(nonIsolatedCpus);
+					+ " => procIds=" + arrayToString(nonIsolatedCpus);
 		}
 		
 		System.out.println("nonIsolatedCpuBitmask: " + a);
@@ -266,7 +266,7 @@ public class CpuInfo {
 			
 			ic = toString(isolatedCpuBitmask)
 					+ " (" + toBinaryString(isolatedCpuBitmask) + ")"
-					+ " procIds=" + arrayToString(isolatedCpus);
+					+ " => procIds=" + arrayToString(isolatedCpus);
 		}
 		
 		System.out.println("isolatedCpuBitmask: " + ic);
