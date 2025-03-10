@@ -48,7 +48,6 @@ public class CpuInfo {
 	private static CpuBitmask[] cpuBitmasks = null;
 	private static int chosenCpuBitmaskSizeInBits = -1;
 	private static int[] nonIsolatedCpus = null;
-	private static Boolean areCpuBitmasksEqual = null;
 	private static Boolean isHyperthreadingOn = null;
 	private static boolean isLinux = false;
 	private static boolean isVerbose = false;
@@ -121,7 +120,7 @@ public class CpuInfo {
 			
 			cpuBitmasks = scan(verbose);
 			
-			areCpuBitmasksEqual = allEqual(cpuBitmasks);
+			boolean areCpuBitmasksEqual = allEqual(cpuBitmasks);
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Cpu bitmasks are equal: " + areCpuBitmasksEqual);
 			
 			CpuBitmask chosenBitmask = null;
@@ -205,8 +204,6 @@ public class CpuInfo {
 		}
 		
 		System.out.println("cpuBitmasksFound: " + r);
-		
-		System.out.println("areCpuBitmasksEqual: " + (areCpuBitmasksEqual == null ? false : areCpuBitmasksEqual.booleanValue()));
 		
 		String c;
 		if (chosenCpuBitmaskSizeInBits < 0 || numberOfProcessors <= 0) {
