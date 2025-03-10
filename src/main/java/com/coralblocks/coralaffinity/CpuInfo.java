@@ -184,30 +184,6 @@ public class CpuInfo {
 		System.out.println("isEnabled: " + isEnabled);
 		System.out.println("isAvailable: " + isAvailable);
 
-		String n;
-		if (numberOfProcessors <= 0) {
-			n = "NOT_AVAILABLE";
-		} else if (numberOfProcessors == 1) {
-			n = "1 (0)";
-		} else {
-			n = String.valueOf(numberOfProcessors) + " (0-" + (numberOfProcessors - 1) + ")";
-		}
-		
-		System.out.println("numberOfProcessors: " + n);
-		
-		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
-		
-		if (isHyperthreadingOn()) {
-			List<List<Integer>> hpairs = getHyperthreadedPairs();
-			StringBuilder sb = new StringBuilder();
-			for (List<Integer> pair : hpairs) {
-				if (sb.length() > 0) sb.append(", ");
-				sb.append(pair);
-            }
-			
-			System.out.println("hyperthreadedPairs: " + sb.toString());
-		}
-		
 		String r;
 		if (cpuBitmasks == null) {
 			r = "NOT_AVAILABLE";
@@ -233,6 +209,37 @@ public class CpuInfo {
 		}
 		
 		System.out.println("chosenCpuBitmaskSize: " + c);
+		
+		String n;
+		if (numberOfProcessors <= 0) {
+			n = "NOT_AVAILABLE";
+		} else if (numberOfProcessors == 1) {
+			n = "1 (0)";
+		} else {
+			
+			StringBuilder sb = new StringBuilder();
+	        for (int i = 0; i < numberOfProcessors; i++) {
+	        	if (sb.length() > 0) sb.append(",");
+	            sb.append(i);
+	        }
+			
+			n = String.valueOf(numberOfProcessors) + " procIds=" + sb.toString();
+		}
+		
+		System.out.println("numberOfProcessors: " + n);
+		
+		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
+		
+		if (isHyperthreadingOn()) {
+			List<List<Integer>> hpairs = getHyperthreadedPairs();
+			StringBuilder sb = new StringBuilder();
+			for (List<Integer> pair : hpairs) {
+				if (sb.length() > 0) sb.append(", ");
+				sb.append(pair);
+            }
+			
+			System.out.println("hyperthreadedPairs: " + sb.toString());
+		}
 		
 		String a;
 		if (nonIsolatedCpus == null || numberOfProcessors <= 0) {
