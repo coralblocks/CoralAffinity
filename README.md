@@ -53,7 +53,7 @@ isolatedCpuBitmask: 7710 (1111000011110) => procIds=1,2,3,4,9,10,11,12
 
 ## SchedResult
 
-When calling the `Affinity.set(int ... procIds)` method, you can check its return value, which is the [Affinity.SchedResult](https://github.com/coralblocks/CoralAffinity/blob/c44b49a18f8a5e9b1945a5463a25c0c42d4349e7/src/main/java/com/coralblocks/coralaffinity/Affinity.java#L15) object. See the example below:
+When calling the `Affinity.set(int ... procIds)` method, you can check its return value, which is the [Affinity.SchedResult](src/main/java/com/coralblocks/coralaffinity/Affinity.java#L15) object. See the example below:
 
 ```java
 int procId = 1;
