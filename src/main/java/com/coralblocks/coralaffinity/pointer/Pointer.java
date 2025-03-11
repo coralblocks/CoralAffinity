@@ -41,6 +41,12 @@ public abstract class Pointer extends ByReference implements CpuMask {
 	    return result;
 	}
 	
+	/*
+	 * Note that this method will ALWAYS return the correct number of bytes,
+	 * in other words, the byte array returned will always have length == numBytes.
+	 * If more bytes are needed than the ones provided by the long array, then these
+	 * bytes will simply be zero.
+	 */
 	static byte[] extractBytes(long[] longs, int numBytes) {
 	    byte[] result = new byte[numBytes];
 	    int bytesExtracted = 0;
