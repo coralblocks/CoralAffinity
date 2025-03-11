@@ -12,7 +12,14 @@ public class Affinity {
 	
 	public static class SchedResult {
 		
-		public static enum Status { OK, NOT_LINUX, NOT_ENABLED, NOT_INITIALIZED, NOT_AVAILABLE, RET_VALUE_NEGATIVE, EXCEPTION, BAD_ARGUMENT }
+		public static enum Status { OK, 
+									NOT_LINUX, 
+									NOT_ENABLED, 
+									NOT_INITIALIZED, 
+									NOT_AVAILABLE, 
+									RET_VALUE_NEGATIVE, 
+									EXCEPTION, 
+									BAD_ARGUMENT }
 		
 		private final Status status;
 		private final Throwable exception;
