@@ -89,12 +89,6 @@ This is done through the `isolcpus` kernel parameter. Below the basics:
 
 #### 1. Identify Available CPU Cores
 First, determine the CPU cores available on your system:
-
-```sh
-lscpu
-```
-or
-
 ```sh
 cat /proc/cpuinfo | grep processor
 ```
