@@ -74,3 +74,11 @@ if (schedResult.isOk()) {
       + " schedResult=" + schedResult);
 }
 ```
+
+## Testing
+
+You can use the included script `./bin/pinThread.sh` to execute the sample PinThread.java to test if CoralAffinity is working on your Linux machine.
+
+<img src="images/LinuxTop.png" alt="WaitingRing" width="35%" height="35%" />
+
+**NOTE:** After running the `top` command on Linux, press "1" to see the list of logical processors.
