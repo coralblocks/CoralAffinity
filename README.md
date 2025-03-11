@@ -82,3 +82,64 @@ You can use the included script `./bin/pinThread.sh` to execute the sample [PinT
 <img src="images/LinuxTop2.png" alt="WaitingRing" width="65%" height="65%" />
 
 **NOTE:** After running the `top` command on Linux, press `1` to see the list of logical processors.
+
+## Isolating CPU Cores on Linux
+
+This is done through the `isolcpus` kernel parameter. Below the basics:
+
+#### 1. Identify Available CPU Cores
+First, determine the CPU cores available on your system:
+
+```sh
+lscpu
+```
+or
+
+```sh
+cat /proc/cpuinfo | grep processor
+```
+
+#### 2. Modify the Boot Loader Configuration
+To isolate specific CPU cores, you need to add the `isolcpus` parameter to your kernel command line.
+
+a) Open the GRUB configuration file:
+   ```sh
+   sudo vi /etc/default/grub
+   ```
+b) Find the line starting with `GRUB_CMDLINE_LINUX_DEFAULT` or `GRUB_CMDLINE_LINUX`.
+
+c) Append the `isolcpus` parameter, specifying the core numbers you want to isolate. For example, to isolate cores 2 and 3:
+   ```sh
+   GRUB_CMDLINE_LINUX_DEFAULT="quiet splash isolcpus=2,3"
+   ```
+d) Save the file and update GRUB:
+   ```sh
+   sudo update-grub
+   ```
+   or, for some distributions:
+   
+   ```sh
+   sudo grub-mkconfig -o /boot/grub/grub.cfg
+   ```
+
+#### 3. Reboot the System
+Reboot for changes to take effect:
+
+```sh
+sudo reboot
+```
+
+#### 4. Verify CPU Isolation
+After rebooting, check the isolated CPUs using:
+
+```sh
+cat /sys/devices/system/cpu/isolated
+```
+
+Alternatively, you can verify with:
+
+```sh
+cat /proc/cmdline
+```
+
+
