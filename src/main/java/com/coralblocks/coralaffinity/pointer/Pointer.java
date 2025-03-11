@@ -21,6 +21,9 @@ import java.util.List;
 import com.coralblocks.coralaffinity.CpuMask;
 import com.sun.jna.ptr.ByReference;
 
+/**
+ * A JNA pointer to be used to set and get the CPU affinity bitmask. 
+ */
 public abstract class Pointer extends ByReference implements CpuMask {
 	
 	private final int sizeInBytes;
@@ -55,6 +58,13 @@ public abstract class Pointer extends ByReference implements CpuMask {
 	    return result;
 	}
 	
+	/**
+	 * Set the pointer bitmask with the given longs from right to left (little-endian).
+	 * 
+	 * <p>For example: [0,5,6,7,8,13,14,15] =&gt; 57825 (1110000111100001)
+	 * 
+	 * @param l the bitmask as a list of longs
+	 */
 	public void set(long ... l) {
 		byte[] bytes = extractBytes(l, sizeInBytes);
 		int index = 0;
@@ -73,12 +83,24 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		return sizeInBytes * 8;
 	}
 	
+	/**
+	 * Reset the pointer bitmask, in other words, set it to 0L (all bits will be set to zero).
+	 */
 	public void reset() {
 		set(0L);
 	}
 	
+	/**
+	 * The list of all pointers, with a variety of sizes in bytes, from 8 to 512 bytes.
+	 */
 	public static final List<Pointer> ALL = new ArrayList<Pointer>(32);
 	
+	/**
+	 * Get the pointer for the given size in bytes.
+	 * 
+	 * @param sizeInBytes the size in bytes
+	 * @return the pointer for that size in bytes
+	 */
 	public static final Pointer get(int sizeInBytes) {
 		for(Pointer p : ALL) {
 			if (p.getSizeInBytes() == sizeInBytes) return p;

@@ -15,12 +15,30 @@
  */
 package com.coralblocks.coralaffinity;
 
+/**
+ * The contract of a CPU bitmask. 
+ */
 public interface CpuMask {
 	
+	/**
+	 * Returns the size of this CPU bitmask in bits.
+	 * 
+	 * @return the size in bits
+	 */
 	public int getSizeInBits();
 	
+	/**
+	 * Returns the size of this CPU bitmask in bytes.
+	 * 
+	 * @return the sizer in bytes
+	 */
 	public int getSizeInBytes();
 	
+	/**
+	 * Returns the value of this CPU bitmask as a list of longs
+	 * 
+	 * @return the value as a list of longs
+	 */
 	public long[] getValue();
 	
 }

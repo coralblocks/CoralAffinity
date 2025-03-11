@@ -23,10 +23,19 @@ import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.PointerType;
 
+/**
+ * The main singleton class used to set the thread affinity. 
+ */
 public class Affinity {
 	
+	/**
+	 * This class represents the result of a call to the native method <code>sched_setaffinity</code>. 
+	 */
 	public static class SchedResult {
 		
+		/**
+		 * The status of the call. The only good/success status is <code>OK</code>. 
+		 */
 		public static enum Status { OK, 
 									NOT_LINUX, 
 									NOT_ENABLED, 
@@ -53,14 +62,30 @@ public class Affinity {
 			this.exception = exception;
 		}
 		
+		/**
+		 * Returns true if the call was successful.
+		 * 
+		 * @return true if sucessful
+		 */
 		public boolean isOk() {
 			return status == Status.OK;
 		}
 		
+		/**
+		 * Returns the status of the call
+		 * 
+		 * @return the status of the call
+		 */
 		public Status getStatus() {
 			return status;
 		}
 		
+		/**
+		 * If the status for the call was <code>EXCEPTION</code> then you can
+		 * use this method to get the exception that was thrown.
+		 * 
+		 * @return the exception thrown by the call
+		 */
 		public Throwable getException() {
 			return exception;
 		}
@@ -123,6 +148,14 @@ public class Affinity {
 		return null;
 	}
 	
+	/**
+	 * Sets the thread affinity of the calling thread to be any schedulable CPU logical processor which is not isolated
+	 * from the kernel scheduler. This method is useful when a thread which is already pinned to an isolated CPU logical
+	 * processor wants to spawn a new thread but does not want this new thread to be pinned to the same isolated CPU logical
+	 * processor, which is what happens by default.
+	 * 
+	 * @return a {@see SchedResult} object with the result of the call
+	 */
 	public synchronized static final SchedResult setSchedulableCpus() {
 		
 		SchedResult schedResult = check();
@@ -133,6 +166,14 @@ public class Affinity {
 		return set(nonIsolatedCpus);
 	}
 	
+	/**
+	 * Sets the thread affinity of the calling thread to be the given list of CPU logical processors.
+	 * Of course the list can contain only a single CPU processor id, to pin a critical thread to a single
+	 * isolated CPU core.
+	 * 
+	 * @param procIds the affinity you want to set as a list of CPU logical processor ids (can be just a single id)
+	 * @return a {@see ShedResult} object with the result of the call
+	 */
 	public synchronized static final SchedResult set(int ... procIds) {
 		
 		SchedResult schedResult = check();
@@ -181,6 +222,11 @@ public class Affinity {
 		public int sched_setaffinity(final int pid, final int cpusetsize, final PointerType cpuset) throws LastErrorException;
 	}
 	
+	/**
+	 * Returns the JNA native library to be used for the native calls.
+	 * 
+	 * @return the JNA native library
+	 */
 	public static CLibrary getLib() {
 		return CLibrary.INSTANCE;
 	}

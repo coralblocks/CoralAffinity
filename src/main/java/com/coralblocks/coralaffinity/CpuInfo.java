@@ -192,6 +192,9 @@ public class CpuInfo {
 		return isAvailable;
 	}
 	
+	/**
+	 * Prints all the information regarding affinity in this machine.
+	 */
 	public static void printInfo() {
 		
 		System.out.println("isEnabled: " + isEnabled);
@@ -338,10 +341,22 @@ public class CpuInfo {
 		return isLinux;
 	}
 	
+	/**
+	 * Returns true if CoralAffinity is available in this machine.
+	 * 
+	 * @return true if available
+	 */
 	public static boolean isAvailable() {
 		return isAvailable(false);
 	}
 	
+	/**
+	 * Returns true if CoralAffinity is enabled in this machine.
+	 * CoralAffinity will be enabled by default unless disabled through
+	 * -DcoralAffinityEnabled=false or through an environment variable.
+	 * 
+	 * @return true if enabled
+	 */
 	public static boolean isEnabled() {
 		return isEnabled;
 	}
@@ -350,31 +365,72 @@ public class CpuInfo {
 		return isInitialized;
 	}
 	
+	/**
+	 * Returns the number of CPU logical processors available in this machine, according to
+	 * the file <code>/proc/cpuinfo</code>.
+	 * 
+	 * @return the number of CPU logical processors
+	 */
 	public static int getNumberOfProcessors() {
 		return numberOfProcessors;
 	}
 	
+	/**
+	 * Returns the list of the isolated CPU logical processors in this machine,
+	 * according to the kernel configuration done through <code>isolcpus</code>.
+	 * It can return an empty array if there is no <code>isolcpus</code> configuration on this
+	 * machine, in other words, if there are no isolated CPU logical processors configured.
+	 * It can also return <code>null</code> if CoralAffinity is not available.
+	 * 
+	 * @return the list of isolated CPU logical processors
+	 */
 	public static int[] getIsolatedCpus() {
 		return isolatedCpus;
 	}
 	
+	/**
+	 * Returns the list of the non-isolated CPU logical processors in this machine,
+	 * according to the kernel configuration done through <code>isolcpus</code>.
+	 * It can return a list with all CPU logical processors in this machine for the case
+	 * that <code>isolcpus</code> is not configured. In that case all CPU logical processors
+	 * in this machine are be non-isolated.
+	 * 
+	 * @return the list of isolated CPU logical processors
+	 */
 	public static int[] getNonIsolatedCpus() {
 		return nonIsolatedCpus;
 	}
 	
-	public static List<List<Integer>> getHyperthreadedPairs() {
-		return hyperthreadedPairs;
-	}
-	
-	public static int getChosenCpuBitmaskSizeInBits() {
-		return chosenCpuBitmaskSizeInBits;
-	}
-	
+	/**
+	 * Returns true if hyperthreading is being used by this machine.
+	 * 
+	 * @return true if hyperthreading is being used by this machine
+	 */
 	public static boolean isHyperthreadingOn() {
 		if (isHyperthreadingOn != null) {
 			return isHyperthreadingOn.booleanValue();
 		}
 		return false;
+	}
+	
+	/**
+	 * Returns the pairs of CPU logical processors representing a single CPU physical core.
+	 * When the machine is using hyperthreading, each physical CPU core will contain two CPU logical processors.
+	 * Note that it can return <code>null</code> is hyperthreading is not being used by the machine.
+	 * 
+	 * @return a list of pairs of CPU logical processors, one for each CPU physical core or <code>null</code> if hyperthreading is off
+	 */
+	public static List<List<Integer>> getHyperthreadedPairs() {
+		return hyperthreadedPairs;
+	}
+	
+	/**
+	 * Returns the chosen CPU bitmask size in bits for this machine.
+	 * 
+	 * @return the size in bits of the chosen CPU bitmask
+	 */
+	public static int getChosenCpuBitmaskSizeInBits() {
+		return chosenCpuBitmaskSizeInBits;
 	}
 	
 	private static int getLogicalProcessors() {
@@ -511,7 +567,7 @@ public class CpuInfo {
 		}
 	}
 	
-	public static long[] getCpuBitmaskFromProcIds(int ... procIds) {
+	static long[] getCpuBitmaskFromProcIds(int ... procIds) {
 		if (!isInitialized || !isAvailable()) {
 			return null;
 		}
@@ -751,7 +807,7 @@ public class CpuInfo {
         }
     }
 
-    public static List<List<Integer>> getHyperthreadPairs() {
+    private static List<List<Integer>> getHyperthreadPairs() {
     	
         List<ProcessorInfo> processors = new ArrayList<>();
         
