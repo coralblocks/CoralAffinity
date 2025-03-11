@@ -182,32 +182,6 @@ public class CpuInfo {
 		System.out.println("isEnabled: " + isEnabled);
 		System.out.println("isAvailable: " + isAvailable);
 
-		String r;
-		if (cpuBitmasks == null) {
-			r = "NOT_AVAILABLE";
-		} else {
-			
-			StringBuilder sb = new StringBuilder();
-			for(CpuBitmask cp : cpuBitmasks) {
-				if (sb.length() > 0) sb.append(", ");
-				sb.append(cp.sizeInBits);
-			}
-			sb.append(" (in bits)");
-			
-			r = String.valueOf(cpuBitmasks.length) + " => " + sb.toString();
-		}
-		
-		System.out.println("cpuBitmasksFound: " + r);
-		
-		String c;
-		if (chosenCpuBitmaskSizeInBits < 0 || numberOfProcessors <= 0) {
-			c = "NOT_AVAILABLE";
-		} else {
-			c = String.valueOf(chosenCpuBitmaskSizeInBits) + " bits";
-		}
-		
-		System.out.println("chosenCpuBitmaskSize: " + c);
-		
 		String n;
 		if (numberOfProcessors <= 0) {
 			n = "NOT_AVAILABLE";
@@ -238,6 +212,32 @@ public class CpuInfo {
 			
 			System.out.println("hyperthreadedPairs: " + sb.toString());
 		}
+		
+		String r;
+		if (cpuBitmasks == null) {
+			r = "NOT_AVAILABLE";
+		} else {
+			
+			StringBuilder sb = new StringBuilder();
+			for(CpuBitmask cp : cpuBitmasks) {
+				if (sb.length() > 0) sb.append(", ");
+				sb.append(cp.sizeInBits);
+			}
+			sb.append(" (in bits)");
+			
+			r = String.valueOf(cpuBitmasks.length) + " => " + sb.toString();
+		}
+		
+		System.out.println("cpuBitmasksFound: " + r);
+		
+		String c;
+		if (chosenCpuBitmaskSizeInBits < 0 || numberOfProcessors <= 0) {
+			c = "NOT_AVAILABLE";
+		} else {
+			c = String.valueOf(chosenCpuBitmaskSizeInBits) + " bits";
+		}
+		
+		System.out.println("chosenCpuBitmaskSize: " + c);
 		
 		String a;
 		if (nonIsolatedCpus == null || numberOfProcessors <= 0) {
