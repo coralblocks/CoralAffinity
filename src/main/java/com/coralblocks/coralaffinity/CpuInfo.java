@@ -642,14 +642,6 @@ public class CpuInfo {
 	    return toReturn;
 	}
 	
-	public static int[] getProcIdsFromCpuBitmask(long ... cpuBitmask) {
-		
-		if (!isInitialized || !isAvailable()) {
-			return null;
-		}
-		return getProcIdsFromCpuBitmask(numberOfProcessorsHolder, cpuBitmask);
-	}
-	
 	static int[] getProcIdsFromCpuBitmask(IntHolder numberOfProcessorsHolder, long ... cpuBitmask) {
 		
 		List<Integer> list = new ArrayList<Integer>(256);
