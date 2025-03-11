@@ -179,7 +179,6 @@ public class CpuInfo {
 	
 	public static void printInfo() {
 		
-		System.out.println("isInitialized: " + isInitialized);
 		System.out.println("isEnabled: " + isEnabled);
 		System.out.println("isAvailable: " + isAvailable);
 
