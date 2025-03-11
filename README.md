@@ -43,7 +43,7 @@ isolatedCpuBitmask: 7710 (1111000011110) => procIds=1,2,3,4,9,10,11,12
 
 - _hyperthreadedPairs_: With hyperthreading, each physical CPU core will have two logical processors. These are the pairs of logical processors per CPU core.
 
-- _cpuBitmasksFound_: The different sizes (in bits) that can be used for the CPU affinity mask. CoralAffinity supports up to 1024 logical processors and can be easily extended to support more.
+- _cpuBitmasksFound_: The different sizes (in bits) that can be used for the CPU affinity mask. `CoralAffinity supports up to 1024 logical processors and can be easily extended to support more.`
 
 - _chosenCpuBitmaskSize_: The chosen CPU affinity mask size (in bits) to be used by CoralAffinity. This will always be greather or equal the number of logical processors, as each processor is represented by one bit.
 
