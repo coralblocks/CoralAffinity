@@ -1069,6 +1069,8 @@ public class CpuInfo {
             }
         }
         
+        hyperthreadPairs.sort((pair1, pair2) -> Integer.compare(pair1.get(0), pair2.get(0)));
+        
         return hyperthreadPairs;
     }
 	
