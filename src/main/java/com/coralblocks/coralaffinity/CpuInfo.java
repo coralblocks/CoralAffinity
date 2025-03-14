@@ -18,14 +18,15 @@ package com.coralblocks.coralaffinity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,6 +77,7 @@ public class CpuInfo {
 	private static int suggestedCpuBitmaskSizeInBits = -1;
 	private static String cpuInfoFile = "/proc/cpuinfo";
 	private static String cmdLineFile = "/proc/cmdline";
+	private static List<Integer> physicalChips = null;
 	
 	private static boolean getBooleanConfig(String configName, boolean defValue) {
 		String s1 = System.getProperty(configName);
@@ -165,6 +167,9 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors);
 			
 			if (numberOfProcessors <= 0) throw new RuntimeException("Got an invalid number of processors: " + numberOfProcessors);
+			
+			physicalChips = getSortedPhysicalChipIds();
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Physical chips: " + physicalChips);
 			
 			chipProcessors = getLogicalProcessorsByPhysicalChipList();
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Processors per chip: " + chipProcessors);
@@ -266,6 +271,22 @@ public class CpuInfo {
 		}
 		
 		System.out.println("numberOfProcessors: " + n);
+		
+		String pc;
+		
+		if (physicalChips == null) {
+			pc = "NOT_AVAILABLE";
+		} else {
+			StringBuilder sb = new StringBuilder();
+			for(int chipId : physicalChips) {
+				if (sb.length() > 0) sb.append(", ");
+				sb.append("Chip").append(chipId);
+			}
+			
+			pc = sb.toString();
+		}
+		
+		System.out.println("physicalChips: " + pc);
 		
 		String ppc;
 		if (chipProcessors == null) {
@@ -571,6 +592,37 @@ public class CpuInfo {
         
         return toReturn;
 	}
+	
+    private static List<Integer> getSortedPhysicalChipIds() {
+    	
+        Set<Integer> chipIds = new HashSet<>();
+        
+        BufferedReader reader = null;
+        
+        try {
+        	
+        	reader = new BufferedReader(new FileReader(cpuInfoFile));
+        	
+            String line;
+            while ((line = reader.readLine()) != null) {
+                if (line.startsWith("physical id")) {
+                    String[] parts = line.split(":", 2);
+                    if (parts.length == 2) {
+                        int id = Integer.parseInt(parts[1].trim());
+                        chipIds.add(id);
+                    }
+                }
+            }
+        } catch (Exception e) {
+	        throw new RuntimeException("Cannot read number of chips from " + cpuInfoFile, e);
+	    } finally {
+	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
+	    }
+        
+        List<Integer> sortedChips = new ArrayList<>(chipIds);
+        Collections.sort(sortedChips);
+        return sortedChips;
+    }
 	
 	private static Boolean isHyperthreadingOn(boolean verbose) {
 		
