@@ -71,6 +71,7 @@ public class CpuInfo {
 	private static boolean isPrintInfo = false;
 	private static boolean isVerboseColors = true;
 	private static List<List<Integer>> hyperthreadedPairs = null;
+	private static int suggestedCpuBitmaskSizeInBits = -1;
 	
 	private static boolean getBooleanConfig(String configName, boolean defValue) {
 		String s1 = System.getProperty(configName);
@@ -84,13 +85,28 @@ public class CpuInfo {
 		}
 	}
 	
+	private static int getIntConfig(String configName, int defValue) {
+		String s1 = System.getProperty(configName);
+		String s2 = System.getenv(configName);
+		if (s1 != null) {
+			return Integer.parseInt(s1);
+		} else if (s2 != null) {
+			return Integer.parseInt(s2);
+		} else {
+			return defValue;
+		}
+	}
+	
 	static {
+		
 		isEnabled = getBooleanConfig("coralAffinityEnabled", isEnabled);
 		
 		String OS = System.getProperty("os.name").toLowerCase();
 		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
 		
 		isVerboseColors = getBooleanConfig("coralAffinityVerboseColors", isVerboseColors);
+		
+		suggestedCpuBitmaskSizeInBits = getIntConfig("coralAffinitySuggestedCpuBitmaskSizeInBits", -1);
 	}
 	
 	static {
@@ -148,7 +164,17 @@ public class CpuInfo {
 			
 			CpuBitmask chosenBitmask = null;
 			
-			for(CpuBitmask bm : cpuBitmasks) {
+			if (suggestedCpuBitmaskSizeInBits > 0) {
+				
+				for(CpuBitmask bm : cpuBitmasks) {
+					if (suggestedCpuBitmaskSizeInBits == bm.sizeInBits) {
+						chosenBitmask = bm;
+						break;
+					}
+				}
+			}
+			
+			if (chosenBitmask == null) for(CpuBitmask bm : cpuBitmasks) {
 				if (numberOfProcessors <= bm.sizeInBits) {
 					chosenBitmask = bm;
 					break;
