@@ -72,6 +72,8 @@ public class CpuInfo {
 	private static boolean isVerboseColors = true;
 	private static List<List<Integer>> hyperthreadedPairs = null;
 	private static int suggestedCpuBitmaskSizeInBits = -1;
+	private static String cpuInfoFile = "/proc/cpuinfo";
+	private static String cmdLineFile = "/proc/cmdline";
 	
 	private static boolean getBooleanConfig(String configName, boolean defValue) {
 		String s1 = System.getProperty(configName);
@@ -97,6 +99,18 @@ public class CpuInfo {
 		}
 	}
 	
+	private static String getStringConfig(String configName, String defValue) {
+		String s1 = System.getProperty(configName);
+		String s2 = System.getenv(configName);
+		if (s1 != null) {
+			return s1;
+		} else if (s2 != null) {
+			return s2;
+		} else {
+			return defValue;
+		}
+	}
+	
 	static {
 		
 		isEnabled = getBooleanConfig("coralAffinityEnabled", isEnabled);
@@ -106,7 +120,11 @@ public class CpuInfo {
 		
 		isVerboseColors = getBooleanConfig("coralAffinityVerboseColors", isVerboseColors);
 		
-		suggestedCpuBitmaskSizeInBits = getIntConfig("coralAffinitySuggestedCpuBitmaskSizeInBits", -1);
+		suggestedCpuBitmaskSizeInBits = getIntConfig("coralAffinitySuggestedCpuBitmaskSizeInBits", suggestedCpuBitmaskSizeInBits);
+		
+		cpuInfoFile = getStringConfig("coralAffinityCpuInfoFile", cpuInfoFile);
+		
+		cmdLineFile = getStringConfig("coralAffinityCmdLineFile", cmdLineFile);
 	}
 	
 	static {
@@ -333,16 +351,16 @@ public class CpuInfo {
 				return false;
 			}
 			
-			File fileCpuInfo = new File("/proc/cpuinfo");
+			File fileCpuInfo = new File(cpuInfoFile);
 			if (!fileCpuInfo.exists()) {
-				if (verbose) System.out.println(VERBOSE_PREFIX + "Cannot find /proc/cpuinfo file!");
+				if (verbose) System.out.println(VERBOSE_PREFIX + "Cannot find " + cpuInfoFile + " file!");
 				isAvailable = false;
 				return false;
 			}
 			
-			File fileCmdLine = new File("/proc/cmdline");
+			File fileCmdLine = new File(cmdLineFile);
 			if (!fileCmdLine.exists()) {
-				if (verbose) System.out.println(VERBOSE_PREFIX + "Cannot find /proc/cmdline file!");
+				if (verbose) System.out.println(VERBOSE_PREFIX + "Cannot find " + cmdLineFile + " file!");
 				isAvailable = false;
 				return false;
 			}
@@ -463,12 +481,12 @@ public class CpuInfo {
 		BufferedReader reader = null;
 		Process process = null;
 	    try {
-	        process = Runtime.getRuntime().exec("grep -c ^processor /proc/cpuinfo");
+	        process = Runtime.getRuntime().exec("grep -c ^processor " + cpuInfoFile);
 	        reader = new BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
 	        String line = reader.readLine();
 	        return Integer.parseInt(line.trim());
 	    } catch (Exception e) {
-	        throw new RuntimeException("Cannot read number of processors from /proc/cpuinfo!", e);
+	        throw new RuntimeException("Cannot read number of processors from " + cpuInfoFile, e);
 	    } finally {
 	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 	    	if (process != null) try { process.destroyForcibly(); } catch(Exception e) { throw new RuntimeException(e); }
@@ -479,10 +497,10 @@ public class CpuInfo {
 
 		BufferedReader reader = null;
 		try {
-			reader = new BufferedReader(new FileReader("/proc/cmdline"));
+			reader = new BufferedReader(new FileReader(cmdLineFile));
 			return reader.readLine();
 		} catch (Exception e) {
-			throw new RuntimeException("Cannot read /proc/cmdline!", e);
+			throw new RuntimeException("Cannot read " + cmdLineFile, e);
 		} finally {
 			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 		}
@@ -833,7 +851,7 @@ public class CpuInfo {
         
         try {
         	
-        	reader = new BufferedReader(new FileReader("/proc/cpuinfo"));
+        	reader = new BufferedReader(new FileReader(cpuInfoFile));
         	
             String line;
             ProcessorInfo info = new ProcessorInfo();
@@ -870,7 +888,7 @@ public class CpuInfo {
             }
             
         } catch(Exception e) {
-        	throw new RuntimeException("Cannot read hyperthreading pairs from /proc/cpuinfo!", e);
+        	throw new RuntimeException("Cannot read hyperthreading pairs from " + cpuInfoFile, e);
         } finally {
 	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 	    }
