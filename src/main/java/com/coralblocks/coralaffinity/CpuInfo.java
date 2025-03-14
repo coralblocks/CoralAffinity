@@ -276,7 +276,7 @@ public class CpuInfo {
 			for(int i = 0; i < chipProcessors.size(); i++) {
 				List<Integer> procs = chipProcessors.get(i);
 				if (i > 0) sb.append(" ");
-				sb.append("Chip0").append(i).append("=[");
+				sb.append("Chip").append(i).append("=[");
 				StringBuilder sb2 = new StringBuilder();
 				for(int procId : procs) {
 					if (sb2.length() > 0) sb2.append(",");
