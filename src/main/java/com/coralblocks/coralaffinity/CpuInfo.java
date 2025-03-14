@@ -267,7 +267,28 @@ public class CpuInfo {
 		
 		System.out.println("numberOfProcessors: " + n);
 		
-		System.out.println("processorsPerChip: " + chipProcessors);
+		String ppc;
+		if (chipProcessors == null) {
+			ppc = "NOT_AVAILABLE";
+		} else {
+			
+			StringBuilder sb = new StringBuilder();
+			for(int i = 0; i < chipProcessors.size(); i++) {
+				List<Integer> procs = chipProcessors.get(i);
+				if (i > 0) sb.append(" ");
+				sb.append(i).append(" => ");
+				StringBuilder sb2 = new StringBuilder();
+				for(int procId : procs) {
+					if (sb2.length() > 0) sb2.append(",");
+					sb2.append(procId);
+				}
+				sb.append(sb2);
+			}
+			
+			ppc = sb.toString();
+		}
+		
+		System.out.println("processorsPerChip: " + ppc);
 		
 		System.out.println("isHyperthreadingOn: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 		
