@@ -1,1 +1,1 @@
-BOOT_IMAGE=/vmlinuz-4.15.0-188-generic root=UUID=9e978c9f-4a6b-4c6e-ae07-0e6f7c9a9451 ro isolcpus=1,2,3,4,9,10,11,12
+BOOT_IMAGE=/vmlinuz-4.15.0-188-generic root=UUID=9e978c9f-4a6b-4c6e-ae07-0e6f7c9a9451 ro isolcpus=2,3,4,5,6,7,8,9
