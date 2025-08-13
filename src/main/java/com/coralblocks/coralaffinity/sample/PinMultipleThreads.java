@@ -18,6 +18,7 @@ package com.coralblocks.coralaffinity.sample;
 import java.util.Arrays;
 
 import com.coralblocks.coralaffinity.Affinity;
+import com.coralblocks.coralaffinity.Affinity.SchedResult;
 
 /**
  * Pin some threads to a set of CPU processors.
@@ -54,14 +55,39 @@ public class PinMultipleThreads {
 				@Override
 	            public void run() {
 
-					Affinity.set(procIds);
+					SchedResult schedResult = Affinity.set(procIds);
+					
+					if (schedResult.isOk()) {
+						
+						System.out.println("Thread pinned!" 
+								+ " threadName="+ Thread.currentThread().getName() 
+								+ " procId=" + Arrays.toString(procIds));
+					} else {
+						
+						System.out.println("Could not pin thread!"
+								+ " threadName="+ Thread.currentThread().getName() 
+								+ " procId=" + Arrays.toString(procIds)
+								+ " schedResult=" + schedResult);
+					}
+					
+					int[] procIds = Affinity.get();
+					
+					if (procIds != null) {
+						
+						System.out.println("Affinity.get() returned " + Arrays.toString(procIds)
+										+ " for thread " + Thread.currentThread().getName());
+						
+					} else {
+						
+						System.out.println("Affinity.get() returned null for thread " + Thread.currentThread().getName());
+					}
 					
 					while(true) {
 						count = (count == Long.MAX_VALUE ? 0 : count + 1);
 					}
 	            }
 				
-			}, "TestThread" + i);
+			}, "TestThread-" + i);
 			
 			System.out.println("Starting thread " + i + "...");
 			

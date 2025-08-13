@@ -15,6 +15,8 @@
  */
 package com.coralblocks.coralaffinity.sample;
 
+import java.util.Arrays;
+
 import com.coralblocks.coralaffinity.Affinity;
 import com.coralblocks.coralaffinity.Affinity.SchedResult;
 
@@ -44,6 +46,18 @@ public class PinThread {
 							+ " threadName="+ Thread.currentThread().getName() 
 							+ " procId=" + procId
 							+ " schedResult=" + schedResult);
+				}
+				
+				int[] procIds = Affinity.get();
+				
+				if (procIds != null) {
+					
+					System.out.println("Affinity.get() returned " + Arrays.toString(procIds)
+					+ " for thread " + Thread.currentThread().getName());
+					
+				} else {
+					
+					System.out.println("Affinity.get() returned null for thread " + Thread.currentThread().getName());
 				}
 				
 				while(true) {
