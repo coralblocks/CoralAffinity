@@ -167,6 +167,42 @@ public class Affinity {
 	}
 	
 	/**
+	 * Returns the affinity bitmask of the current thread as a list of integers
+	 * corresponding to the CPU logical processors.
+	 * 
+	 * Note that it can be just one, for the case that the thread was pinned to a single CPU logical processor.
+	 * Also note that in Linux the thread affinity can never be empty (i.e. bitmask zero), in other words,
+	 * this method can never return an empty array.
+	 * 
+	 * @return the list of CPU logical processors from the affinity bitmask
+	 */
+	public synchronized static final int[] get() {
+		
+		SchedResult schedResult = check();
+		if (schedResult != null) return null;
+		
+		int sizeInBytes = CpuInfo.getChosenCpuBitmaskSizeInBits() / 8;
+		
+		Pointer p = Pointer.newInstance(sizeInBytes);
+		
+		final CLibrary lib = Affinity.getLib();
+		
+		try {
+			
+			int ret = lib.sched_getaffinity(0, p.getSizeInBytes(), p);
+			
+			if (ret >= 0) {
+				return CpuInfo.getProcIdsFromCpuBitmask(CpuInfo.getNumberOfProcessorsHolder(), p.getValue());
+			} else {
+				return null;
+			}
+			
+		} catch(Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+	
+	/**
 	 * Sets the thread affinity of the calling thread to be the given list of CPU logical processors.
 	 * Of course the list can contain only a single CPU processor id, to pin a critical thread to a single
 	 * isolated CPU core.
