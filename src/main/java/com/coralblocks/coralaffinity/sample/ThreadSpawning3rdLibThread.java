@@ -53,8 +53,8 @@ public class ThreadSpawning3rdLibThread {
 				
 				System.out.println("Starting parent thread with affinity " + procIdMainThread + "...");
 				
-				while(true) {
-					if (count1++ == 100_000_000) break; // run for a bit
+				for(int i = 0; i < 200_000_000; i++) { // run for a bit
+					count1 += System.nanoTime();
 				}
 				
 				System.out.println("Changing parent thread affinity to " + procIdSecondThread + "...");
