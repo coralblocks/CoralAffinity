@@ -183,7 +183,8 @@ public class Affinity {
 		
 		int sizeInBytes = CpuInfo.getChosenCpuBitmaskSizeInBits() / 8;
 		
-		Pointer p = Pointer.newInstance(sizeInBytes);
+		Pointer p = Pointer.get(sizeInBytes);
+		p.reset();
 		
 		final CLibrary lib = Affinity.getLib();
 		
