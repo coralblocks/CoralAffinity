@@ -33,7 +33,7 @@ public class PinThread {
 			@Override
             public void run() {
 
-				SchedResult schedResult = Affinity.set(procId);
+				SchedResult schedResult = procId >= 0 ? Affinity.set(procId) : Affinity.setSchedulableCpus();
 				
 				if (schedResult.isOk()) {
 					
