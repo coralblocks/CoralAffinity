@@ -81,6 +81,21 @@ if (schedResult.isOk()) {
 }
 ```
 
+## Affinity.setSchedulableCpus()
+
+You can use the method `setSchedulableCpus()` from Affinity to set the affinity mask to be any _non-isolated_ cpu core, in other words, cpu cores that are _schedulable_ by the kernel. Below we list the method documentation for reference:
+```java
+	/**
+	 * Sets the thread affinity of the calling thread to be any schedulable CPU logical processor which is not isolated
+	 * from the kernel scheduler. This method is useful when a thread which is already pinned to an isolated CPU logical
+	 * processor wants to spawn a new thread but does not want this new thread to be pinned to the same isolated CPU logical
+	 * processor, which is what happens by default.
+	 * 
+	 * @return a {@see SchedResult} object with the result of the call
+	 */
+	public synchronized static final SchedResult setSchedulableCpus();
+```
+
 ## Testing
 
 You can use the included script `./bin/pinThread.sh` to execute the sample [PinThread.java](src/main/java/com/coralblocks/coralaffinity/sample/PinThread.java) to test if CoralAffinity is working on your Linux machine.
