@@ -153,4 +153,24 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		ALL.add(new _512BitsPointer());
 		ALL.add(new _1024BitsPointer());
 	}
+	
+	/**
+	 * Create a new instance for a pointer with the given number of bytes.
+	 * 
+	 * @param sizeInBytes the size in bytes
+	 * @return a new instance of a pointer for that size in bytes
+	 */
+	public static final Pointer newInstance(int sizeInBytes) {
+		for(int i = 0; i < ALL.size(); i++) {
+			Pointer p = ALL.get(i);
+			if (p.getSizeInBytes() == sizeInBytes) {
+				try {
+					return p.getClass().getDeclaredConstructor().newInstance();
+				} catch(Exception e) {
+					throw new RuntimeException(e);
+				}
+			}
+		}
+		return null;
+	}
 }
