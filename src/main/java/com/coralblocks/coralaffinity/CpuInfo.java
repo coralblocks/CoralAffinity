@@ -458,6 +458,10 @@ public class CpuInfo {
 		return isInitialized;
 	}
 	
+	static IntHolder getNumberOfProcessorsHolder() {
+		return numberOfProcessorsHolder;
+	}
+	
 	/**
 	 * Returns the number of CPU logical processors available in this machine, according to
 	 * the file <code>/proc/cpuinfo</code>.
