@@ -86,10 +86,12 @@ if (schedResult.isOk()) {
 You can use the method `setSchedulableCpus()` from [Affinity](https://github.com/coralblocks/CoralAffinity/blob/1b287c590a75ad7afef153877d3c3b364bbd0041/src/main/java/com/coralblocks/coralaffinity/Affinity.java#L159) to set the affinity mask to be any _non-isolated_ cpu core, in other words, cpu cores that are _schedulable_ by the kernel. Below we list this method documentation for reference:
 ```java
 	/**
-	 * Sets the thread affinity of the calling thread to be any schedulable CPU logical processor which is not isolated
-	 * from the kernel scheduler. This method is useful when a thread which is already pinned to an isolated CPU logical
-	 * processor wants to spawn a new thread but does not want this new thread to be pinned to the same isolated CPU logical
-	 * processor, which is what happens by default.
+	 * Sets the thread affinity of the calling thread to be any schedulable CPU logical
+ 	 * processor which is not isolated from the kernel scheduler.
+ 	 * This method is useful when a thread which is already pinned to an isolated CPU
+	 * logical processor wants to spawn a new thread but does not want this new thread
+	 * to be pinned to the same isolated CPU logical processor, which is what happens
+	 * by default.
 	 * 
 	 * @return a {@see SchedResult} object with the result of the call
 	 */
