@@ -84,7 +84,7 @@ public class ThreadSpawning3rdLibThread {
 					
 				}, "ChildThread");
 				
-				child.start();
+				child.start(); // NOTE: You must start the thread before switching back the affinity below
 				
 				System.out.println("Switching back parent thread affinity to " + procIdMainThread + "...");
 				
