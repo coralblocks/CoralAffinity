@@ -154,7 +154,7 @@ public class Affinity {
 	 * processor wants to spawn a new thread but does not want this new thread to be pinned to the same isolated CPU logical
 	 * processor, which is what happens by default.
 	 * 
-	 * @return a {@see SchedResult} object with the result of the call
+	 * @return a {@link SchedResult} object with the result of the call
 	 */
 	public synchronized static final SchedResult setSchedulableCpus() {
 		
@@ -164,6 +164,20 @@ public class Affinity {
 		int[] nonIsolatedCpus = CpuInfo.getNonIsolatedCpus();
 		
 		return set(nonIsolatedCpus);
+	}
+	
+	private static final ThreadLocal<SchedResult> tlSchedResult = new ThreadLocal<SchedResult>();
+	
+	/**
+	 * Returns the last {@link SchedResult} for methods that do not return a {@link SchedResult}
+	 * themselves. For example, {@link #get()} returns an <code>int[]</code> so you can use this
+	 * getter method to get the {@link SchedResult} originated from the invocation of the {@link #get()}
+	 * method.
+	 * 
+	 * @return a {@link SchedResult} object with the result of the last call which does not return a {@link SchedResult}
+	 */
+	public synchronized static final SchedResult getSchedResult() {
+		return tlSchedResult.get();
 	}
 	
 	/**
@@ -179,7 +193,10 @@ public class Affinity {
 	public synchronized static final int[] get() {
 		
 		SchedResult schedResult = check();
-		if (schedResult != null) return null;
+		if (schedResult != null) {
+			tlSchedResult.set(schedResult);
+			return null;
+		}
 		
 		int sizeInBytes = CpuInfo.getChosenCpuBitmaskSizeInBits() / 8;
 		
@@ -193,13 +210,17 @@ public class Affinity {
 			int ret = lib.sched_getaffinity(0, p.getSizeInBytes(), p);
 			
 			if (ret >= 0) {
-				return CpuInfo.getProcIdsFromCpuBitmask(CpuInfo.getNumberOfProcessorsHolder(), p.getValue());
+				int[] retVal = CpuInfo.getProcIdsFromCpuBitmask(CpuInfo.getNumberOfProcessorsHolder(), p.getValue());
+				tlSchedResult.set(SCHED_RESULT_OK);
+				return retVal;
 			} else {
+				tlSchedResult.set(SCHED_RESULT_RET_VALUE_NEGATIVE);
 				return null;
 			}
 			
 		} catch(Throwable t) {
-			throw new RuntimeException(t);
+			tlSchedResult.set(new SchedResult(t));
+			return null;
 		}
 	}
 	
@@ -209,7 +230,7 @@ public class Affinity {
 	 * isolated CPU core.
 	 * 
 	 * @param procIds the affinity you want to set as a list of CPU logical processor ids (can be just a single id)
-	 * @return a {@see ShedResult} object with the result of the call
+	 * @return a {@link SchedResult} object with the result of the call
 	 */
 	public synchronized static final SchedResult set(int ... procIds) {
 		
