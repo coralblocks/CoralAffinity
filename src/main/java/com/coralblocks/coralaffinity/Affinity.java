@@ -83,7 +83,9 @@ public class Affinity {
 		
 		/**
 		 * If the status for the call was <code>EXCEPTION</code> then you can
-		 * use this method to get the exception that was thrown.
+		 * use this method to get the exception that was thrown. Native call failures
+		 * are reported as {@link LastErrorException}; its {@link LastErrorException#getErrorCode()}
+		 * method returns the original errno value.
 		 * 
 		 * @return the exception thrown by the call
 		 */

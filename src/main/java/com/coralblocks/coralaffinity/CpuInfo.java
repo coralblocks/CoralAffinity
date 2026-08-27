@@ -695,17 +695,17 @@ public class CpuInfo {
 	        throw new IllegalArgumentException("Invalid size: " + sizeInBits + ". Must be between 1 and 64 (inclusive)!");
 	    }
 	    
-	    List<Integer> clearedPositions = new ArrayList<>();
+	    List<Integer> setPositions = new ArrayList<>();
 
 	    for (int i = 0; i < sizeInBits; i++) {
 	        if ((bitmask & (1L << i)) != 0) {
-	            clearedPositions.add(i);
+	            setPositions.add(i);
 	        }
 	    }
 
-	    int[] toReturn = new int[clearedPositions.size()];
-	    for (int i = 0; i < clearedPositions.size(); i++) {
-	        toReturn[i] = clearedPositions.get(i);
+	    int[] toReturn = new int[setPositions.size()];
+	    for (int i = 0; i < setPositions.size(); i++) {
+	        toReturn[i] = setPositions.get(i);
 	    }
 
 	    return toReturn;
