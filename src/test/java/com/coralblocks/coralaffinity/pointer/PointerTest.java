@@ -40,6 +40,15 @@ public class PointerTest {
 	}
 
 	@Test
+	public void testSetClearsRemainingWords() {
+		Pointer pointer = Pointer.get(2 * Long.BYTES);
+		pointer.set(-1L, -1L);
+		pointer.set(1L);
+
+		Assert.assertArrayEquals(new long[] { 1L, 0L }, pointer.getValue());
+	}
+
+	@Test
 	public void testSetAndGetValueRoundTripForAllPointerSizes() {
 		long[] values = new long[16];
 		for(int i = 0; i < values.length; i++) {

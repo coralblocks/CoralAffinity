@@ -260,7 +260,6 @@ public class Affinity {
 			throw new IllegalStateException("Got an invalid cpuBitMask: " + Arrays.toString(procIds));
 		}
 		
-		pointer.reset();
 		pointer.set(cpuBitmask);
 		
 		try {
