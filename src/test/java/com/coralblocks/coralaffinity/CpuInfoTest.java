@@ -15,12 +15,51 @@
  */
 package com.coralblocks.coralaffinity;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 import com.coralblocks.coralaffinity.CpuInfo.IntHolder;
 
 public class CpuInfoTest {
+
+	public static class InitializationFailureProbe {
+
+		public static void main(String[] args) {
+			System.out.println(CpuInfo.isAvailable());
+			System.out.println(CpuInfo.isInitialized());
+			System.out.println(CpuInfo.getInitializationFailure() instanceof NumberFormatException);
+			System.out.println(Affinity.set(0).getStatus());
+		}
+	}
+
+	@Test
+	public void testInitializationFailure() throws Exception {
+
+		String classPath = String.join(File.pathSeparator,
+				new File(CpuInfo.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath(),
+				new File(CpuInfoTest.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath(),
+				new File(com.sun.jna.Platform.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath(),
+				new File(Test.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath());
+
+		Process process = new ProcessBuilder(
+				new File(System.getProperty("java.home"), "bin/java").getPath(),
+				"-Dos.name=Linux",
+				"-DcoralAffinityEnabled=false",
+				"-DcoralAffinitySuggestedCpuBitmaskSizeInBits=invalid",
+				"-cp",
+				classPath,
+				InitializationFailureProbe.class.getName())
+				.redirectErrorStream(true)
+				.start();
+
+		String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+
+		Assert.assertEquals(output, 0, process.waitFor());
+		Assert.assertEquals("false\ntrue\ntrue\nNOT_AVAILABLE", output.replace("\r\n", "\n"));
+	}
 
 	@Test
 	public void testIsolcpusFlags() {

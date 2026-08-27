@@ -115,6 +115,10 @@ public class Affinity {
 	}
 	
 	private static SchedResult check() {
+
+		if (CpuInfo.getInitializationFailure() != null) {
+			return SCHED_RESULT_NOT_AVAILABLE;
+		}
 		
 		if (!CpuInfo.isLinux()) {
 			return SCHED_RESULT_NOT_LINUX;

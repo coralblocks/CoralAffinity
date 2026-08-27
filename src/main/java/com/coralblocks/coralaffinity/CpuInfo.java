@@ -78,6 +78,7 @@ public class CpuInfo {
 	private static String cpuInfoFile = "/proc/cpuinfo";
 	private static String cmdLineFile = "/proc/cmdline";
 	private static List<Integer> physicalChips = null;
+	private static Throwable initializationFailure = null;
 	
 	private static boolean getBooleanConfig(String configName, boolean defValue) {
 		String s1 = System.getProperty(configName);
@@ -116,36 +117,44 @@ public class CpuInfo {
 	}
 	
 	static {
-		
-		isEnabled = getBooleanConfig("coralAffinityEnabled", isEnabled);
-		
-		String OS = System.getProperty("os.name").toLowerCase();
-		isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
-		
-		isVerboseColors = getBooleanConfig("coralAffinityVerboseColors", isVerboseColors);
-		
-		suggestedCpuBitmaskSizeInBits = getIntConfig("coralAffinitySuggestedCpuBitmaskSizeInBits", suggestedCpuBitmaskSizeInBits);
-		
-		cpuInfoFile = getStringConfig("coralAffinityCpuInfoFile", cpuInfoFile);
-		
-		cmdLineFile = getStringConfig("coralAffinityCmdLineFile", cmdLineFile);
-	}
-	
-	static {
-		
-		isVerbose = getBooleanConfig("coralAffinityVerbose", isVerbose);
-		
-		if (isVerbose) System.out.println();
-		CpuInfo.init(isVerbose);
-		if (isVerbose) System.out.println();
-		
-		isPrintInfo = getBooleanConfig("coralAffinityPrintInfo", isPrintInfo);
-		
-		if (isPrintInfo) {
-			if (!isVerbose) System.out.println();
-			CpuInfo.printInfo();
-			System.out.println();
+
+		try {
+			isEnabled = getBooleanConfig("coralAffinityEnabled", isEnabled);
+
+			String OS = System.getProperty("os.name").toLowerCase();
+			isLinux = OS.contains("nix") || OS.contains("nux") || OS.contains("aix");
+
+			isVerboseColors = getBooleanConfig("coralAffinityVerboseColors", isVerboseColors);
+
+			suggestedCpuBitmaskSizeInBits = getIntConfig("coralAffinitySuggestedCpuBitmaskSizeInBits", suggestedCpuBitmaskSizeInBits);
+
+			cpuInfoFile = getStringConfig("coralAffinityCpuInfoFile", cpuInfoFile);
+
+			cmdLineFile = getStringConfig("coralAffinityCmdLineFile", cmdLineFile);
+
+			isVerbose = getBooleanConfig("coralAffinityVerbose", isVerbose);
+
+			if (isVerbose) System.out.println();
+			CpuInfo.init(isVerbose);
+			if (isVerbose) System.out.println();
+
+			isPrintInfo = getBooleanConfig("coralAffinityPrintInfo", isPrintInfo);
+
+			if (isPrintInfo) {
+				if (!isVerbose) System.out.println();
+				CpuInfo.printInfo();
+				System.out.println();
+			}
+		} catch (Exception | LinkageError e) {
+			recordInitializationFailure(e);
 		}
+	}
+
+	private static void recordInitializationFailure(Throwable failure) {
+		if (initializationFailure == null) initializationFailure = failure;
+		isAvailable = false;
+		isInitialized = true;
+		if (isVerbose) printlnRed(VERBOSE_PREFIX + "Initialization failed: " + failure.getMessage());
 	}
 	
 	private CpuInfo() {
@@ -456,6 +465,10 @@ public class CpuInfo {
 	
 	public static boolean isInitialized() {
 		return isInitialized;
+	}
+
+	static Throwable getInitializationFailure() {
+		return initializationFailure;
 	}
 	
 	static IntHolder getNumberOfProcessorsHolder() {
