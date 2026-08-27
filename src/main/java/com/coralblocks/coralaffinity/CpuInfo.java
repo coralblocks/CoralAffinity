@@ -177,7 +177,7 @@ public class CpuInfo {
 			isHyperthreadingOn = isHyperthreadingOn(verbose);
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Is hyperthreading on: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 			
-			if (isHyperthreadingOn) {
+			if (Boolean.TRUE.equals(isHyperthreadingOn)) {
 				hyperthreadedPairs = getHyperthreadPairs();
 				if (verbose) System.out.println(VERBOSE_PREFIX + "Hyperthreaded pairs: " + hyperthreadedPairs);
 			}
