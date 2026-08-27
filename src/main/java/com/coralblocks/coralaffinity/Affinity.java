@@ -174,14 +174,14 @@ public class Affinity {
 	private static final ThreadLocal<SchedResult> tlSchedResult = new ThreadLocal<SchedResult>();
 	
 	/**
-	 * Returns the last {@link SchedResult} for methods that do not return a {@link SchedResult}
-	 * themselves. For example, {@link #get()} returns an <code>int[]</code> so you can use this
-	 * getter method to get the {@link SchedResult} originated from the invocation of the {@link #get()}
-	 * method.
+	 * Returns the {@link SchedResult} from the most recent {@link #get()} call made by the current
+	 * thread, or <code>null</code> if the current thread has never called {@link #get()}. The value
+	 * remains associated with the thread until its next {@link #get()} call, so callers using pooled
+	 * threads should inspect it immediately after calling {@link #get()}.
 	 * 
-	 * @return a {@link SchedResult} object with the result of the last call which does not return a {@link SchedResult}
+	 * @return the result of the current thread's most recent {@link #get()} call
 	 */
-	public synchronized static final SchedResult getSchedResult() {
+	public static final SchedResult getSchedResult() {
 		return tlSchedResult.get();
 	}
 	
