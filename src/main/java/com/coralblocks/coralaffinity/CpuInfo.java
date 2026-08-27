@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -74,7 +75,7 @@ public class CpuInfo {
 	private static boolean isPrintInfo = false;
 	private static boolean isVerboseColors = true;
 	private static List<List<Integer>> hyperthreadedPairs = null;
-	private static List<List<Integer>> chipProcessors = null;
+	private static Map<Integer, List<Integer>> chipProcessors = null;
 	private static int suggestedCpuBitmaskSizeInBits = -1;
 	private static String cpuInfoFile = "/proc/cpuinfo";
 	private static String cmdLineFile = "/proc/cmdline";
@@ -179,10 +180,10 @@ public class CpuInfo {
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors
 					+ " => procIds=" + arrayToString(logicalProcessorIds));
 			
-			physicalChips = getSortedPhysicalChipIds();
+			chipProcessors = getLogicalProcessorsByPhysicalChip();
+			physicalChips = new ArrayList<>(chipProcessors.keySet());
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Physical chips: " + physicalChips);
 			
-			chipProcessors = getLogicalProcessorsByPhysicalChipList();
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Processors per chip: " + chipProcessors);
 			
 			List<List<Integer>> detectedHyperthreadPairs = getHyperthreadPairs();
@@ -281,7 +282,7 @@ public class CpuInfo {
 		
 		String pc;
 		
-		if (physicalChips == null) {
+		if (physicalChips == null || physicalChips.isEmpty()) {
 			pc = "NOT_AVAILABLE";
 		} else {
 			StringBuilder sb = new StringBuilder();
@@ -296,15 +297,15 @@ public class CpuInfo {
 		System.out.println("physicalChips: " + pc);
 		
 		String ppc;
-		if (chipProcessors == null) {
+		if (chipProcessors == null || chipProcessors.isEmpty()) {
 			ppc = "NOT_AVAILABLE";
 		} else {
-			
+
 			StringBuilder sb = new StringBuilder();
-			for(int i = 0; i < chipProcessors.size(); i++) {
-				List<Integer> procs = chipProcessors.get(i);
-				if (i > 0) sb.append(" ");
-				sb.append("Chip").append(i).append("=[");
+			for(Map.Entry<Integer, List<Integer>> entry : chipProcessors.entrySet()) {
+				List<Integer> procs = entry.getValue();
+				if (sb.length() > 0) sb.append(" ");
+				sb.append("Chip").append(entry.getKey()).append("=[");
 				StringBuilder sb2 = new StringBuilder();
 				for(int procId : procs) {
 					if (sb2.length() > 0) sb2.append(",");
@@ -533,7 +534,7 @@ public class CpuInfo {
 	/**
 	 * Returns the pairs of CPU logical processors representing a single CPU physical core.
 	 * When the machine is using hyperthreading, each physical CPU core will contain two CPU logical processors.
-	 * Note that it can return <code>null</code> is hyperthreading is not being used by the machine.
+	 * Note that it can return <code>null</code> if hyperthreading is not being used by the machine.
 	 * 
 	 * @return a list of pairs of CPU logical processors, one for each CPU physical core or <code>null</code> if hyperthreading is off
 	 */
@@ -597,7 +598,8 @@ public class CpuInfo {
 	}
 	
 	static int[] getIsolcpusProcIds(final String cmdline) {
-		
+        if (cmdline == null || cmdline.isEmpty()) return new int[0];
+
         Pattern pattern = Pattern.compile("\\bisolcpus=([^\\s]+)");
         Matcher matcher = pattern.matcher(cmdline);
 
@@ -641,37 +643,6 @@ public class CpuInfo {
         
         return toReturn;
 	}
-	
-    private static List<Integer> getSortedPhysicalChipIds() {
-    	
-        Set<Integer> chipIds = new HashSet<>();
-        
-        BufferedReader reader = null;
-        
-        try {
-        	
-        	reader = new BufferedReader(new FileReader(cpuInfoFile));
-        	
-            String line;
-            while ((line = reader.readLine()) != null) {
-                if (line.startsWith("physical id")) {
-                    String[] parts = line.split(":", 2);
-                    if (parts.length == 2) {
-                        int id = Integer.parseInt(parts[1].trim());
-                        chipIds.add(id);
-                    }
-                }
-            }
-        } catch (Exception e) {
-	        throw new RuntimeException("Cannot read number of chips from " + cpuInfoFile, e);
-	    } finally {
-	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
-	    }
-        
-        List<Integer> sortedChips = new ArrayList<>(chipIds);
-        Collections.sort(sortedChips);
-        return sortedChips;
-    }
 	
 	static long[] getCpuBitmaskFromProcIds(int ... procIds) {
 		if (!isInitialized || !isAvailable()) {
@@ -913,77 +884,53 @@ public class CpuInfo {
         }
     }
     
-    private static List<List<Integer>> getLogicalProcessorsByPhysicalChipList() {
-    	
-        List<ProcessorInfo> processors = new ArrayList<>();
-        
-        BufferedReader reader = null;
-        
-        try {
-        	
-        	reader = new BufferedReader(new FileReader(cpuInfoFile));
-        	
-            String line;
-            ProcessorInfo info = new ProcessorInfo();
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                    if (info.hasProcessorAndChip()) {
-                        processors.add(info);
-                    }
-                    info = new ProcessorInfo();
-                } else {
-                    String[] parts = line.split(":", 2);
-                    if (parts.length < 2) {
-                        continue;
-                    }
-                    String key = parts[0].trim();
-                    String value = parts[1].trim();
-                    if ("processor".equals(key)) {
-                        info.processor = Integer.parseInt(value);
-                    } else if ("physical id".equals(key)) {
-                        info.physicalId = Integer.parseInt(value);
-                    }
-                }
-            }
-            
-            if (info.hasProcessorAndChip()) {
-                processors.add(info);
-            }
-            
-        } catch(Exception e) {
-        	throw new RuntimeException("Cannot read logical processors per chip from " + cpuInfoFile, e);
-        } finally {
-	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
-	    }
-        
-        Map<Integer, List<Integer>> chipMap = new HashMap<>();
-        for (ProcessorInfo p : processors) {
-            chipMap.computeIfAbsent(p.physicalId, k -> new ArrayList<>()).add(p.processor);
-        }
-        
-        for (List<Integer> list : chipMap.values()) {
-            Collections.sort(list);
-        }
-        
-        int maxPhysicalId = -1;
-        for (int chipId : chipMap.keySet()) {
-            if (chipId > maxPhysicalId) {
-                maxPhysicalId = chipId;
-            }
-        }
-        
-        List<List<Integer>> result = new ArrayList<>(maxPhysicalId + 1);
-        for (int i = 0; i <= maxPhysicalId; i++) {
-            result.add(new ArrayList<>());
-        }
-        
-        for (Map.Entry<Integer, List<Integer>> entry : chipMap.entrySet()) {
-            int chipId = entry.getKey();
-            result.set(chipId, entry.getValue());
-        }
-        
-        return result;
-    }
+	private static Map<Integer, List<Integer>> getLogicalProcessorsByPhysicalChip() {
+		BufferedReader reader = null;
+		try {
+			reader = new BufferedReader(new FileReader(cpuInfoFile));
+			return getLogicalProcessorsByPhysicalChip(reader);
+		} catch(Exception e) {
+			throw new RuntimeException("Cannot read logical processors per chip from " + cpuInfoFile, e);
+		} finally {
+			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
+		}
+	}
+
+	static Map<Integer, List<Integer>> getLogicalProcessorsByPhysicalChip(BufferedReader reader) throws IOException {
+		List<ProcessorInfo> processors = new ArrayList<>();
+		String line;
+		ProcessorInfo info = new ProcessorInfo();
+		while ((line = reader.readLine()) != null) {
+			if (line.trim().isEmpty()) {
+				if (info.hasProcessorAndChip()) processors.add(info);
+				info = new ProcessorInfo();
+			} else {
+				String[] parts = line.split(":", 2);
+				if (parts.length < 2) continue;
+
+				String key = parts[0].trim();
+				String value = parts[1].trim();
+				if ("processor".equals(key)) {
+					info.processor = Integer.parseInt(value);
+				} else if ("physical id".equals(key)) {
+					info.physicalId = Integer.parseInt(value);
+				}
+			}
+		}
+
+		if (info.hasProcessorAndChip()) processors.add(info);
+
+		Map<Integer, List<Integer>> chipMap = new TreeMap<>();
+		for (ProcessorInfo p : processors) {
+			chipMap.computeIfAbsent(p.physicalId, k -> new ArrayList<>()).add(p.processor);
+		}
+
+		for (List<Integer> list : chipMap.values()) {
+			Collections.sort(list);
+		}
+
+		return chipMap;
+	}
 
     private static List<List<Integer>> getHyperthreadPairs() {
         BufferedReader reader = null;

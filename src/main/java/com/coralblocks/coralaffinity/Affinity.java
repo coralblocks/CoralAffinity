@@ -49,8 +49,9 @@ public class Affinity {
 		private final Throwable exception;
 		
 		SchedResult(Status status) {
-			this(status, null);
 			if (status == Status.EXCEPTION) throw new IllegalArgumentException();
+			this.status = status;
+			this.exception = null;
 		}
 		
 		SchedResult(Throwable exception) {
@@ -205,6 +206,9 @@ public class Affinity {
 		int sizeInBytes = CpuInfo.getChosenCpuBitmaskSizeInBits() / 8;
 		
 		Pointer p = Pointer.get(sizeInBytes);
+		if (p == null) { // should never happen
+			throw new IllegalStateException("Got a null pointer for sizeInBytes: " + sizeInBytes);
+		}
 		p.reset();
 		
 		final CLibrary lib = Affinity.getLib();

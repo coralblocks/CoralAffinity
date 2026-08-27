@@ -19,7 +19,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -107,6 +110,33 @@ public class CpuInfoTest {
 		int[] procs = CpuInfo.getIsolcpusProcIds("quiet isolcpus=domain,nohz,managed_irq,2-5 splash");
 
 		Assert.assertArrayEquals(new int[] { 2, 3, 4, 5 }, procs);
+	}
+
+	@Test
+	public void testEmptyIsolcpusCmdline() {
+
+		Assert.assertArrayEquals(new int[0], CpuInfo.getIsolcpusProcIds(null));
+		Assert.assertArrayEquals(new int[0], CpuInfo.getIsolcpusProcIds(""));
+	}
+
+	@Test
+	public void testSparsePhysicalChipIds() throws Exception {
+
+		String cpuInfo = "processor : 7\nphysical id : 3\n\n"
+				+ "processor : 1\nphysical id : 0\n\n"
+				+ "processor : 6\nphysical id : 3\n";
+		Map<Integer, List<Integer>> processors = CpuInfo.getLogicalProcessorsByPhysicalChip(
+				new BufferedReader(new StringReader(cpuInfo)));
+
+		Assert.assertEquals(Arrays.asList(0, 3), new ArrayList<>(processors.keySet()));
+		Assert.assertEquals(Arrays.asList(1), processors.get(0));
+		Assert.assertEquals(Arrays.asList(6, 7), processors.get(3));
+		Assert.assertFalse(processors.containsKey(1));
+		Assert.assertFalse(processors.containsKey(2));
+
+		String unknownTopology = "processor : 0\n\nprocessor : 1\n";
+		Assert.assertTrue(CpuInfo.getLogicalProcessorsByPhysicalChip(
+				new BufferedReader(new StringReader(unknownTopology))).isEmpty());
 	}
 
 	@Test

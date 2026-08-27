@@ -51,7 +51,7 @@ isolatedCpuBitmask: 1020 (1111111100) => procIds=2,3,4,5,6,7,8,9
 
 - _cpuBitmasksFound_: The different sizes (in bits) that can be used for the CPU affinity mask. `CoralAffinity supports up to 1024 logical processors and can be easily extended to support more.`
 
-- _chosenCpuBitmaskSize_: The chosen CPU affinity mask size (in bits) to be used by CoralAffinity. This will always be greather or equal the number of logical processors, as each processor is represented by one bit.
+- _chosenCpuBitmaskSize_: The chosen CPU affinity mask size (in bits) to be used by CoralAffinity. This will always be greater than or equal to the number of logical processors, as each processor is represented by one bit.
 
 - _nonIsolatedCpuBitmask_: The CPU mask and the processor ids that are _not isolated_ from the kernel scheduler. If no thread affinity is set, the kernel will execute the thread on one of these logical processors.
 
@@ -158,5 +158,4 @@ Alternatively, you can verify with:
 ```sh
 cat /proc/cmdline
 ```
-
 
