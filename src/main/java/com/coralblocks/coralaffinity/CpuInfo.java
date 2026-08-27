@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -186,11 +185,12 @@ public class CpuInfo {
 			chipProcessors = getLogicalProcessorsByPhysicalChipList();
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Processors per chip: " + chipProcessors);
 			
-			isHyperthreadingOn = isHyperthreadingOn(verbose);
+			List<List<Integer>> detectedHyperthreadPairs = getHyperthreadPairs();
+			isHyperthreadingOn = detectedHyperthreadPairs == null ? null : !detectedHyperthreadPairs.isEmpty();
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Is hyperthreading on: " + (isHyperthreadingOn == null ? "UNKNOWN" : isHyperthreadingOn));
 			
 			if (Boolean.TRUE.equals(isHyperthreadingOn)) {
-				hyperthreadedPairs = getHyperthreadPairs();
+				hyperthreadedPairs = detectedHyperthreadPairs;
 				if (verbose) System.out.println(VERBOSE_PREFIX + "Hyperthreaded pairs: " + hyperthreadedPairs);
 			}
 			
@@ -673,73 +673,6 @@ public class CpuInfo {
         return sortedChips;
     }
 	
-	private static Boolean isHyperthreadingOn(boolean verbose) {
-		
-		if (verbose) System.out.println(VERBOSE_PREFIX + "Will check for hyperthreading...");
-		
-		Process process = null;
-
-		try {
-
-			process = new ProcessBuilder("lscpu").start();
-
-			int exitCode = process.waitFor();
-
-			if (exitCode != 0) {
-				if (verbose) System.out.println(VERBOSE_PREFIX + "lscpu returned bad exit code: " + exitCode);
-				return null;
-			}
-
-			BufferedReader reader = null;
-
-			try {
-
-				reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-				String line;
-
-				while ((line = reader.readLine()) != null) {
-					
-					if (line.trim().startsWith("Thread(s) per core:")) {
-						
-						String[] parts = line.split(":\\s+");
-						
-						if (parts.length == 2) {
-							
-							int threadsPerCore = Integer.parseInt(parts[1].trim());
-							
-							if (verbose) System.out.println(VERBOSE_PREFIX + "Threads per core: " + threadsPerCore);
-							
-							return threadsPerCore > 1;
-							
-						} else {
-							
-							if (verbose) System.out.println(VERBOSE_PREFIX + "Bad line: " + line);
-							
-							return null;
-						}
-					}
-				}
-				
-				if (verbose) System.out.println(VERBOSE_PREFIX + "Could not find Threads per core!");
-				
-				return null;
-				
-			} catch (Exception e) {
-				if (verbose) System.out.println(VERBOSE_PREFIX + "Exception: " + e.getMessage());
-				return null;
-			} finally {
-				if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
-			}
-
-		} catch (Exception e) {
-			if (verbose) System.out.println(VERBOSE_PREFIX + "Exception: " + e.getMessage());
-			return null;
-		} finally {
-			if (process != null) try { process.destroyForcibly(); } catch(Exception e) { throw new RuntimeException(e); }
-		}
-	}
-	
 	static long[] getCpuBitmaskFromProcIds(int ... procIds) {
 		if (!isInitialized || !isAvailable()) {
 			return null;
@@ -974,6 +907,10 @@ public class CpuInfo {
         boolean hasProcessorAndChip() {
         	return processor != -1 && physicalId != -1;
         }
+
+        boolean hasProcessorTopology() {
+            return processor != -1 && physicalId != -1 && coreId != -1;
+        }
     }
     
     private static List<List<Integer>> getLogicalProcessorsByPhysicalChipList() {
@@ -1049,57 +986,51 @@ public class CpuInfo {
     }
 
     private static List<List<Integer>> getHyperthreadPairs() {
-    	
-        List<ProcessorInfo> processors = new ArrayList<>();
-        
         BufferedReader reader = null;
-        
-        try {
-        	
-        	reader = new BufferedReader(new FileReader(cpuInfoFile));
-        	
-            String line;
-            ProcessorInfo info = new ProcessorInfo();
-            while ((line = reader.readLine()) != null) {
-                if (line.trim().isEmpty()) {
-                	
-                    if (info.hasProcessor()) {
-                        processors.add(info);
-                    }
-                    info = new ProcessorInfo();
-                    
-                } else {
-                	
-                    String[] parts = line.split(":", 2);
-                    
-                    if (parts.length < 2) {
-                        continue;
-                    }
-                    String key = parts[0].trim();
-                    String value = parts[1].trim();
-                    
-                    if ("processor".equals(key)) {
-                        info.processor = Integer.parseInt(value);
-                    } else if ("physical id".equals(key)) {
-                        info.physicalId = Integer.parseInt(value);
-                    } else if ("core id".equals(key)) {
-                        info.coreId = Integer.parseInt(value);
-                    }
-                }
-            }
 
-            if (info.hasProcessor()) {
-                processors.add(info);
-            }
-            
+        try {
+        	reader = new BufferedReader(new FileReader(cpuInfoFile));
+			return getHyperthreadPairs(reader);
         } catch(Exception e) {
         	throw new RuntimeException("Cannot read hyperthreading pairs from " + cpuInfoFile, e);
         } finally {
 	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 	    }
+    }
+
+    static List<List<Integer>> getHyperthreadPairs(BufferedReader reader) throws IOException {
+        List<ProcessorInfo> processors = new ArrayList<>();
+        String line;
+        ProcessorInfo info = new ProcessorInfo();
+        while ((line = reader.readLine()) != null) {
+            if (line.trim().isEmpty()) {
+                if (info.hasProcessor()) processors.add(info);
+                info = new ProcessorInfo();
+            } else {
+                String[] parts = line.split(":", 2);
+                if (parts.length < 2) continue;
+
+                String key = parts[0].trim();
+                String value = parts[1].trim();
+                if ("processor".equals(key)) {
+                    info.processor = Integer.parseInt(value);
+                } else if ("physical id".equals(key)) {
+                    info.physicalId = Integer.parseInt(value);
+                } else if ("core id".equals(key)) {
+                    info.coreId = Integer.parseInt(value);
+                }
+            }
+        }
+
+        if (info.hasProcessor()) processors.add(info);
 
         Map<String, List<Integer>> coreMap = new HashMap<>();
+        boolean hasIncompleteTopology = false;
         for (ProcessorInfo p : processors) {
+            if (!p.hasProcessorTopology()) {
+                hasIncompleteTopology = true;
+                continue;
+            }
             String key = p.physicalId + "-" + p.coreId;
             coreMap.computeIfAbsent(key, k -> new ArrayList<>()).add(p.processor);
         }
@@ -1119,7 +1050,9 @@ public class CpuInfo {
         }
         
         hyperthreadPairs.sort((pair1, pair2) -> Integer.compare(pair1.get(0), pair2.get(0)));
-        
+
+        if (hyperthreadPairs.isEmpty() && hasIncompleteTopology) return null;
+
         return hyperthreadPairs;
     }
 	

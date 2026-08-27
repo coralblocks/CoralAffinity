@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -26,6 +27,26 @@ import org.junit.Test;
 import com.coralblocks.coralaffinity.CpuInfo.IntHolder;
 
 public class CpuInfoTest {
+
+	@Test
+	public void testHyperthreadingFromCpuInfo() throws Exception {
+
+		String hyperthreaded = "processor : 0\nphysical id : 0\ncore id : 0\n\n"
+				+ "processor : 1\nphysical id : 0\ncore id : 0\n\n"
+				+ "processor : 2\nphysical id : 0\ncore id : 1\n\n"
+				+ "processor : 3\nphysical id : 0\ncore id : 1\n";
+		Assert.assertEquals(Arrays.asList(Arrays.asList(0, 1), Arrays.asList(2, 3)),
+				CpuInfo.getHyperthreadPairs(new BufferedReader(new StringReader(hyperthreaded))));
+
+		String notHyperthreaded = "processor : 0\nphysical id : 0\ncore id : 0\n\n"
+				+ "processor : 1\nphysical id : 0\ncore id : 1\n";
+		Assert.assertTrue(CpuInfo.getHyperthreadPairs(
+				new BufferedReader(new StringReader(notHyperthreaded))).isEmpty());
+
+		String unknownTopology = "processor : 0\n\nprocessor : 1\n";
+		Assert.assertNull(CpuInfo.getHyperthreadPairs(
+				new BufferedReader(new StringReader(unknownTopology))));
+	}
 
 	@Test
 	public void testSparseLogicalProcessorIds() throws Exception {
