@@ -144,7 +144,7 @@ public class Affinity {
 		if (procIds == null || procIds.length == 0) return SCHED_RESULT_BAD_ARGUMENT;
 		
 		for(int i : procIds) {
-			if (i < 0 || i >= CpuInfo.getNumberOfProcessors()) {
+			if (!CpuInfo.isLogicalProcessorId(i)) {
 				return SCHED_RESULT_BAD_ARGUMENT;
 			}
 		}
@@ -214,7 +214,7 @@ public class Affinity {
 			int ret = lib.sched_getaffinity(0, p.getSizeInBytes(), p);
 			
 			if (ret >= 0) {
-				int[] retVal = CpuInfo.getProcIdsFromCpuBitmask(CpuInfo.getNumberOfProcessorsHolder(), p.getValue());
+				int[] retVal = CpuInfo.getProcIdsFromCpuBitmask(CpuInfo.getCpuMaskSizeInBitsHolder(), p.getValue());
 				tlSchedResult.set(SCHED_RESULT_OK);
 				return retVal;
 			} else {

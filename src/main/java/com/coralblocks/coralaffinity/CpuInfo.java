@@ -18,6 +18,7 @@ package com.coralblocks.coralaffinity;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +61,8 @@ public class CpuInfo {
 	
 	private static boolean isInitialized = false;
 	private static int numberOfProcessors = -1;
-	private static IntHolder numberOfProcessorsHolder = null;
+	private static int[] logicalProcessorIds = null;
+	private static IntHolder cpuMaskSizeInBitsHolder = null;
 	private static boolean isEnabled = true;
 	private static Boolean isAvailable = null;
 	private static int[] isolatedCpus = null;
@@ -171,11 +173,12 @@ public class CpuInfo {
 		
 		if (isAvailable) {
 			
-			numberOfProcessors = getLogicalProcessors();
-			numberOfProcessorsHolder = new IntHolder(numberOfProcessors);
-			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors);
-			
+			logicalProcessorIds = getLogicalProcessorIds();
+			numberOfProcessors = logicalProcessorIds.length;
 			if (numberOfProcessors <= 0) throw new RuntimeException("Got an invalid number of processors: " + numberOfProcessors);
+			cpuMaskSizeInBitsHolder = new IntHolder(logicalProcessorIds[numberOfProcessors - 1] + 1);
+			if (verbose) System.out.println(VERBOSE_PREFIX + "Number of processors: " + numberOfProcessors
+					+ " => procIds=" + arrayToString(logicalProcessorIds));
 			
 			physicalChips = getSortedPhysicalChipIds();
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Physical chips: " + physicalChips);
@@ -212,7 +215,7 @@ public class CpuInfo {
 			}
 			
 			if (chosenBitmask == null) for(CpuBitmask bm : cpuBitmasks) {
-				if (numberOfProcessors <= bm.sizeInBits) {
+				if (cpuMaskSizeInBitsHolder.getValue() <= bm.sizeInBits) {
 					chosenBitmask = bm;
 					break;
 				}
@@ -226,23 +229,25 @@ public class CpuInfo {
 						printlnGreen(VERBOSE_PREFIX + "sizeInBits: " + r.sizeInBits
 							+ " => cpuMask: " + toString(r.cpuMask)
 							+ " (" + toBinaryString(r.cpuMask) + ")"
-							+ " procIds=" + arrayToString(getProcIdsFromCpuBitmask(numberOfProcessorsHolder, r.cpuMask)));
+							+ " procIds=" + arrayToString(getProcIdsFromCpuBitmask(cpuMaskSizeInBitsHolder, r.cpuMask)));
 					}
 					
 					System.out.println();
 					
 					printlnRed(VERBOSE_PREFIX + "Could not choose a bitmask size to use!"
 							+ " numberOfProcessors=" + numberOfProcessors
+							+ " requiredCpuMaskSizeInBits=" + cpuMaskSizeInBitsHolder.getValue()
 							+ " sizeInBits=" + getSizeInBits(cpuBitmasks));
 				}
 				
 				throw new RuntimeException("Could not choose a bitmask size to use!"
 						+ " numberOfProcessors=" + numberOfProcessors
+						+ " requiredCpuMaskSizeInBits=" + cpuMaskSizeInBitsHolder.getValue()
 						+ " sizeInBits=" + getSizeInBits(cpuBitmasks));
 			}
 			
 			chosenCpuBitmaskSizeInBits = chosenBitmask.sizeInBits;
-			nonIsolatedCpus = getProcIdsFromCpuBitmask(numberOfProcessorsHolder, chosenBitmask.cpuMask);
+			nonIsolatedCpus = getProcIdsFromCpuBitmask(cpuMaskSizeInBitsHolder, chosenBitmask.cpuMask);
 			
 			if (verbose) System.out.println(VERBOSE_PREFIX + "Bitmask chosen: sizeInBits=" + chosenBitmask.sizeInBits
 					+ " cpuMask=" + toString(chosenBitmask.cpuMask)
@@ -267,16 +272,9 @@ public class CpuInfo {
 		if (numberOfProcessors <= 0) {
 			n = "NOT_AVAILABLE";
 		} else if (numberOfProcessors == 1) {
-			n = "1 (0)";
+			n = "1 (" + logicalProcessorIds[0] + ")";
 		} else {
-			
-			StringBuilder sb = new StringBuilder();
-	        for (int i = 0; i < numberOfProcessors; i++) {
-	        	if (sb.length() > 0) sb.append(",");
-	            sb.append(i);
-	        }
-			
-			n = String.valueOf(numberOfProcessors) + " => procIds=" + sb.toString();
+			n = String.valueOf(numberOfProcessors) + " => procIds=" + arrayToString(logicalProcessorIds);
 		}
 		
 		System.out.println("numberOfProcessors: " + n);
@@ -364,7 +362,7 @@ public class CpuInfo {
 			a = "NOT_AVAILABLE";
 		} else {
 			
-			long[] nonIsolatedCpuBitmask = getCpuBitmaskFromProcIds(numberOfProcessorsHolder, nonIsolatedCpus);
+			long[] nonIsolatedCpuBitmask = getCpuBitmaskFromProcIds(cpuMaskSizeInBitsHolder, nonIsolatedCpus);
 			
 			a = toString(nonIsolatedCpuBitmask)
 					+ " (" + toBinaryString(nonIsolatedCpuBitmask) + ")"
@@ -380,7 +378,7 @@ public class CpuInfo {
 			ic = "NOT_DEFINED";
 		} else {
 			
-			long[] isolatedCpuBitmask = getCpuBitmaskFromProcIds(numberOfProcessorsHolder, isolatedCpus);
+			long[] isolatedCpuBitmask = getCpuBitmaskFromProcIds(cpuMaskSizeInBitsHolder, isolatedCpus);
 			
 			ic = toString(isolatedCpuBitmask)
 					+ " (" + toBinaryString(isolatedCpuBitmask) + ")"
@@ -471,8 +469,16 @@ public class CpuInfo {
 		return initializationFailure;
 	}
 	
-	static IntHolder getNumberOfProcessorsHolder() {
-		return numberOfProcessorsHolder;
+	static IntHolder getCpuMaskSizeInBitsHolder() {
+		return cpuMaskSizeInBitsHolder;
+	}
+
+	static boolean isLogicalProcessorId(int processorId) {
+		return isLogicalProcessorId(logicalProcessorIds, processorId);
+	}
+
+	static boolean isLogicalProcessorId(int[] processorIds, int processorId) {
+		return processorIds != null && Arrays.binarySearch(processorIds, processorId) >= 0;
 	}
 	
 	/**
@@ -543,20 +549,37 @@ public class CpuInfo {
 		return chosenCpuBitmaskSizeInBits;
 	}
 	
-	private static int getLogicalProcessors() {
+	private static int[] getLogicalProcessorIds() {
 		BufferedReader reader = null;
-		Process process = null;
-	    try {
-	        process = Runtime.getRuntime().exec("grep -c ^processor " + cpuInfoFile);
-	        reader = new BufferedReader(new java.io.InputStreamReader(process.getInputStream()));
-	        String line = reader.readLine();
-	        return Integer.parseInt(line.trim());
-	    } catch (Exception e) {
-	        throw new RuntimeException("Cannot read number of processors from " + cpuInfoFile, e);
-	    } finally {
-	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
-	    	if (process != null) try { process.destroyForcibly(); } catch(Exception e) { throw new RuntimeException(e); }
-	    }
+		try {
+			reader = new BufferedReader(new FileReader(cpuInfoFile));
+			return getLogicalProcessorIds(reader);
+		} catch (Exception e) {
+			throw new RuntimeException("Cannot read logical processor ids from " + cpuInfoFile, e);
+		} finally {
+			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
+		}
+	}
+
+	static int[] getLogicalProcessorIds(BufferedReader reader) throws IOException {
+		Set<Integer> processorIds = new HashSet<>();
+		String line;
+		while ((line = reader.readLine()) != null) {
+			String[] parts = line.split(":", 2);
+			if (parts.length == 2 && "processor".equals(parts[0].trim())) {
+				processorIds.add(Integer.parseInt(parts[1].trim()));
+			}
+		}
+
+		List<Integer> sortedProcessorIds = new ArrayList<>(processorIds);
+		Collections.sort(sortedProcessorIds);
+
+		int[] toReturn = new int[sortedProcessorIds.size()];
+		for (int i = 0; i < sortedProcessorIds.size(); i++) {
+			toReturn[i] = sortedProcessorIds.get(i);
+		}
+
+		return toReturn;
 	}
 	
 	private static String readProcCmdline() {
@@ -720,13 +743,13 @@ public class CpuInfo {
 		if (!isInitialized || !isAvailable()) {
 			return null;
 		}
-		return getCpuBitmaskFromProcIds(numberOfProcessorsHolder, procIds);
+		return getCpuBitmaskFromProcIds(cpuMaskSizeInBitsHolder, procIds);
 	}
 	
-	private static void ensureValidProcIds(int[] procIds, int numberOfProcessors) {
+	private static void ensureValidProcIds(int[] procIds, int cpuMaskSizeInBits) {
 		for(int i : procIds) {
-			if (i < 0 || i >= numberOfProcessors) {
-				throw new IllegalArgumentException("Invalid procId! procId=" + i + " numberOfProcessors=" + numberOfProcessors);
+			if (i < 0 || i >= cpuMaskSizeInBits) {
+				throw new IllegalArgumentException("Invalid procId! procId=" + i + " cpuMaskSizeInBits=" + cpuMaskSizeInBits);
 			}
 		}
 	}
@@ -748,13 +771,13 @@ public class CpuInfo {
 	    return truncated ^ mask;
 	}
 	
-	static long[] getCpuBitmaskFromProcIds(IntHolder numberOfProcessorsHolder, int ... procIds) {
+	static long[] getCpuBitmaskFromProcIds(IntHolder cpuMaskSizeInBitsHolder, int ... procIds) {
 		
-		final int numberOfProcessors = numberOfProcessorsHolder.getValue();
+		final int cpuMaskSizeInBits = cpuMaskSizeInBitsHolder.getValue();
 		
-		ensureValidProcIds(procIds, numberOfProcessors);
+		ensureValidProcIds(procIds, cpuMaskSizeInBits);
 		
-		int numberOfLongs = (numberOfProcessors - 1) / 64 + 1;
+		int numberOfLongs = (cpuMaskSizeInBits - 1) / 64 + 1;
 		
 		long[] bitmask = new long[numberOfLongs];
 		
@@ -791,11 +814,11 @@ public class CpuInfo {
 	    return toReturn;
 	}
 	
-	static int[] getProcIdsFromCpuBitmask(IntHolder numberOfProcessorsHolder, long ... cpuBitmask) {
+	static int[] getProcIdsFromCpuBitmask(IntHolder cpuMaskSizeInBitsHolder, long ... cpuBitmask) {
 		
 		List<Integer> list = new ArrayList<Integer>(256);
 		
-		int remainingBits = numberOfProcessorsHolder.getValue();
+		int remainingBits = cpuMaskSizeInBitsHolder.getValue();
 
 		for(int i = 0; i < cpuBitmask.length; i++) {
 			

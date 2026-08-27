@@ -15,7 +15,9 @@
  */
 package com.coralblocks.coralaffinity;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 
 import org.junit.Assert;
@@ -24,6 +26,23 @@ import org.junit.Test;
 import com.coralblocks.coralaffinity.CpuInfo.IntHolder;
 
 public class CpuInfoTest {
+
+	@Test
+	public void testSparseLogicalProcessorIds() throws Exception {
+
+		String cpuInfo = "processor : 3\n\nprocessor : 0\n\nprocessor : 1\n";
+		int[] processorIds = CpuInfo.getLogicalProcessorIds(new BufferedReader(new StringReader(cpuInfo)));
+
+		Assert.assertArrayEquals(new int[] { 0, 1, 3 }, processorIds);
+		Assert.assertTrue(CpuInfo.isLogicalProcessorId(processorIds, 3));
+		Assert.assertFalse(CpuInfo.isLogicalProcessorId(processorIds, 2));
+
+		IntHolder cpuMaskSizeInBits = new IntHolder(processorIds[processorIds.length - 1] + 1);
+		long[] cpuMask = CpuInfo.getCpuBitmaskFromProcIds(cpuMaskSizeInBits, 3);
+
+		Assert.assertArrayEquals(new long[] { 8 }, cpuMask);
+		Assert.assertArrayEquals(new int[] { 3 }, CpuInfo.getProcIdsFromCpuBitmask(cpuMaskSizeInBits, cpuMask));
+	}
 
 	public static class InitializationFailureProbe {
 
