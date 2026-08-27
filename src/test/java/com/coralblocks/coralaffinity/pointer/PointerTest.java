@@ -25,6 +25,11 @@ import org.junit.Test;
 public class PointerTest {
 
 	@Test
+	public void testAllIsUnmodifiable() {
+		Assert.assertThrows(UnsupportedOperationException.class, () -> Pointer.ALL.clear());
+	}
+
+	@Test
 	public void testSetUsesNativeByteOrder() {
 		long value = 0x1122334455667788L;
 		Pointer pointer = Pointer.get(Long.BYTES);
