@@ -552,14 +552,10 @@ public class CpuInfo {
 	}
 	
 	private static int[] getLogicalProcessorIds() {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(cpuInfoFile));
+		try (BufferedReader reader = new BufferedReader(new FileReader(cpuInfoFile))) {
 			return getLogicalProcessorIds(reader);
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot read logical processor ids from " + cpuInfoFile, e);
-		} finally {
-			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 		}
 	}
 
@@ -585,15 +581,10 @@ public class CpuInfo {
 	}
 	
 	private static String readProcCmdline() {
-
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(cmdLineFile));
+		try (BufferedReader reader = new BufferedReader(new FileReader(cmdLineFile))) {
 			return reader.readLine();
 		} catch (Exception e) {
 			throw new RuntimeException("Cannot read " + cmdLineFile, e);
-		} finally {
-			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 		}
 	}
 	
@@ -885,14 +876,10 @@ public class CpuInfo {
     }
     
 	private static Map<Integer, List<Integer>> getLogicalProcessorsByPhysicalChip() {
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new FileReader(cpuInfoFile));
+		try (BufferedReader reader = new BufferedReader(new FileReader(cpuInfoFile))) {
 			return getLogicalProcessorsByPhysicalChip(reader);
 		} catch(Exception e) {
 			throw new RuntimeException("Cannot read logical processors per chip from " + cpuInfoFile, e);
-		} finally {
-			if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
 		}
 	}
 
@@ -932,18 +919,13 @@ public class CpuInfo {
 		return chipMap;
 	}
 
-    private static List<List<Integer>> getHyperthreadPairs() {
-        BufferedReader reader = null;
-
-        try {
-        	reader = new BufferedReader(new FileReader(cpuInfoFile));
+	private static List<List<Integer>> getHyperthreadPairs() {
+		try (BufferedReader reader = new BufferedReader(new FileReader(cpuInfoFile))) {
 			return getHyperthreadPairs(reader);
-        } catch(Exception e) {
-        	throw new RuntimeException("Cannot read hyperthreading pairs from " + cpuInfoFile, e);
-        } finally {
-	    	if (reader != null) try { reader.close(); } catch(Exception e) { throw new RuntimeException(e); }
-	    }
-    }
+		} catch(Exception e) {
+			throw new RuntimeException("Cannot read hyperthreading pairs from " + cpuInfoFile, e);
+		}
+	}
 
     static List<List<Integer>> getHyperthreadPairs(BufferedReader reader) throws IOException {
         List<ProcessorInfo> processors = new ArrayList<>();
