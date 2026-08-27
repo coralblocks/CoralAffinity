@@ -505,13 +505,14 @@ public class CpuInfo {
 	}
 	
 	/**
-	 * Returns the list of the non-isolated CPU logical processors in this machine,
-	 * according to the kernel configuration done through <code>isolcpus</code>.
-	 * It can return a list with all CPU logical processors in this machine for the case
-	 * that <code>isolcpus</code> is not configured. In that case all CPU logical processors
-	 * in this machine are be non-isolated.
+	 * Returns the CPU logical processor ids from the affinity mask captured from the thread
+	 * that initialized this class. Despite the method's historical name, this mask is not
+	 * derived from <code>isolcpus</code>. It can reflect restrictions imposed by tools and
+	 * environments such as <code>taskset</code>, containers, cgroups, or systemd, and is not
+	 * guaranteed to be the complement of {@link #getIsolatedCpus()}.
+	 * It can return <code>null</code> if CoralAffinity is not available.
 	 * 
-	 * @return the list of isolated CPU logical processors
+	 * @return the CPU logical processor ids in the affinity mask captured during initialization
 	 */
 	public static int[] getNonIsolatedCpus() {
 		return nonIsolatedCpus;

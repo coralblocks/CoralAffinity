@@ -20,8 +20,9 @@ import com.coralblocks.coralaffinity.Affinity;
 /**
  * A thread spawned by another thread, which already has its affinity set, will be created with the same affinity
  * of the parent thread. To avoid this you can bind the child thread to another procId or use the convenient method
- * <code>Affinity.setSchedulableCpus()</code> to tell the kernel to schedule the child thread to any non-isolated CPU
- * processor. That allows a critical thread to spawn another thread that will not compete with it for the CPU processor.
+ * <code>Affinity.setSchedulableCpus()</code> to restore the affinity mask captured during CoralAffinity initialization.
+ * That allows a critical thread to spawn another thread that will not compete with it for the pinned CPU processor while
+ * preserving any affinity restrictions present when CoralAffinity was initialized.
  */
 public class ThreadSpawningThread {
 	

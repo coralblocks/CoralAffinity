@@ -153,10 +153,10 @@ public class Affinity {
 	}
 	
 	/**
-	 * Sets the thread affinity of the calling thread to be any schedulable CPU logical processor which is not isolated
-	 * from the kernel scheduler. This method is useful when a thread which is already pinned to an isolated CPU logical
-	 * processor wants to spawn a new thread but does not want this new thread to be pinned to the same isolated CPU logical
-	 * processor, which is what happens by default.
+	 * Sets the calling thread's affinity to the mask captured from the thread that initialized {@link CpuInfo}.
+	 * This is useful when a pinned thread wants to restore that captured CPU set before spawning another thread.
+	 * Despite the method's historical name, the mask is not derived from <code>isolcpus</code> and can
+	 * include restrictions imposed by tools and environments such as <code>taskset</code>, containers, cgroups, or systemd.
 	 * 
 	 * @return a {@link SchedResult} object with the result of the call
 	 */
