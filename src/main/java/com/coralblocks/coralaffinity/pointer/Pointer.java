@@ -33,49 +33,44 @@ public abstract class Pointer extends ByReference implements CpuMask {
 		this.sizeInBytes = sizeInBytes;
 	}
 	
-	static byte[] splitLongIntoBytes(long value) {
-	    byte[] result = new byte[8];
-	    for (int i = 0; i < 8; i++) {
-	        result[i] = (byte) ((value >> (8 * i)) & 0xFF);
-	    }
-	    return result;
-	}
-	
-	/*
-	 * Note that this method will ALWAYS return the correct number of bytes,
-	 * in other words, the byte array returned will always have length == numBytes.
-	 * If more bytes are needed than the ones provided by the long array, then these
-	 * bytes will simply be zero.
-	 */
-	static byte[] extractBytes(long[] longs, int numBytes) {
-	    byte[] result = new byte[numBytes];
-	    int bytesExtracted = 0;
-	    
-	    for (long l : longs) {
-	        if (bytesExtracted >= numBytes) {
-	            break;
-	        }
-	        byte[] bytes = splitLongIntoBytes(l);
-	        for (int i = 0; i < 8 && bytesExtracted < numBytes; i++) {
-	            result[bytesExtracted++] = bytes[i];
-	        }
-	    }
-	    
-	    return result;
-	}
-	
 	/**
-	 * Set the pointer bitmask with the given longs from right to left (little-endian).
+	 * Set the pointer bitmask with the given longs in native byte order.
 	 * 
 	 * <p>For example: [0,5,6,7,8,13,14,15] =&gt; 57825 (1110000111100001)
 	 * 
 	 * @param l the bitmask as a list of longs
 	 */
 	public void set(long ... l) {
-		byte[] bytes = extractBytes(l, sizeInBytes);
-		int index = 0;
-		for(byte b : bytes) {
-			getPointer().setByte(index++, b);
+		int offset = 0;
+		int valueIndex = 0;
+		while(offset < sizeInBytes) {
+			int bytesToWrite = Math.min(Long.BYTES, sizeInBytes - offset);
+			long value = valueIndex < l.length ? l[valueIndex] : 0L;
+			writeNative(value, offset, bytesToWrite);
+			offset += bytesToWrite;
+			valueIndex++;
+		}
+	}
+
+	private void writeNative(long value, int offset, int bytesToWrite) {
+		if (bytesToWrite == Long.BYTES) {
+			getPointer().setLong(offset, value);
+			return;
+		}
+		if (bytesToWrite >= Integer.BYTES) {
+			getPointer().setInt(offset, (int) value);
+			value >>>= Integer.SIZE;
+			offset += Integer.BYTES;
+			bytesToWrite -= Integer.BYTES;
+		}
+		if (bytesToWrite >= Short.BYTES) {
+			getPointer().setShort(offset, (short) value);
+			value >>>= Short.SIZE;
+			offset += Short.BYTES;
+			bytesToWrite -= Short.BYTES;
+		}
+		if (bytesToWrite == Byte.BYTES) {
+			getPointer().setByte(offset, (byte) value);
 		}
 	}
 	
