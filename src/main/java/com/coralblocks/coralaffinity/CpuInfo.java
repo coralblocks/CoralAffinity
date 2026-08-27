@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import com.coralblocks.coralaffinity.Affinity.CLibrary;
 import com.coralblocks.coralaffinity.pointer.Pointer;
+import com.sun.jna.NativeLong;
 
 public class CpuInfo {
 	
@@ -755,6 +756,9 @@ public class CpuInfo {
 		if (verbose) System.out.println(VERBOSE_PREFIX + "Will begin scan: thread=" + Thread.currentThread().getName());
 		
 		for(Pointer p : Pointer.ALL) {
+
+			// Linux requires cpusetsize to be a multiple of sizeof(unsigned long).
+			if (p.getSizeInBytes() % NativeLong.SIZE != 0) continue;
 			
 			if (verbose) System.out.print(VERBOSE_PREFIX + "Trying " + p.getClass().getSimpleName());
 			
