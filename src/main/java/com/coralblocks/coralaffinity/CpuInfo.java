@@ -559,7 +559,7 @@ public class CpuInfo {
 		}
 	}
 	
-	private static int[] getIsolcpusProcIds(final String cmdline) {
+	static int[] getIsolcpusProcIds(final String cmdline) {
 		
         Pattern pattern = Pattern.compile("\\bisolcpus=([^\\s]+)");
         Matcher matcher = pattern.matcher(cmdline);
@@ -571,19 +571,27 @@ public class CpuInfo {
         String value = matcher.group(1);
         
         List<Integer> cpuList = new ArrayList<>();
+        Pattern cpuPattern = Pattern.compile("(\\d+)(?:-(\\d+)(?::(\\d+)/(\\d+))?)?");
         String[] tokens = value.split(",");
         for (String token : tokens) {
             token = token.trim();
-            if (token.contains("-")) {
-                String[] rangeParts = token.split("-");
-                int start = Integer.parseInt(rangeParts[0].trim());
-                int end = Integer.parseInt(rangeParts[1].trim());
-                for (int i = start; i <= end; i++) {
-                    if (!cpuList.contains(i)) cpuList.add(i);
+            Matcher cpuMatcher = cpuPattern.matcher(token);
+            if (!cpuMatcher.matches()) continue;
+
+            try {
+                int start = Integer.parseInt(cpuMatcher.group(1));
+                int end = cpuMatcher.group(2) != null ? Integer.parseInt(cpuMatcher.group(2)) : start;
+                int usedSize = cpuMatcher.group(3) != null ? Integer.parseInt(cpuMatcher.group(3)) : 1;
+                int groupSize = cpuMatcher.group(4) != null ? Integer.parseInt(cpuMatcher.group(4)) : 1;
+
+                if (start > end || usedSize <= 0 || groupSize <= 0 || usedSize > groupSize) continue;
+
+                for (long i = start; i <= end; i++) {
+                    int cpu = (int) i;
+                    if ((i - start) % groupSize < usedSize && !cpuList.contains(cpu)) cpuList.add(cpu);
                 }
-            } else {
-            	int i = Integer.parseInt(token);
-            	if (!cpuList.contains(i)) cpuList.add(i);
+            } catch (NumberFormatException e) {
+                // Ignore malformed CPU-list tokens.
             }
         }
         

@@ -21,7 +21,23 @@ import org.junit.Test;
 import com.coralblocks.coralaffinity.CpuInfo.IntHolder;
 
 public class CpuInfoTest {
-	
+
+	@Test
+	public void testIsolcpusFlags() {
+
+		int[] procs = CpuInfo.getIsolcpusProcIds("quiet isolcpus=domain,nohz,managed_irq,2-5 splash");
+
+		Assert.assertArrayEquals(new int[] { 2, 3, 4, 5 }, procs);
+	}
+
+	@Test
+	public void testIsolcpusStride() {
+
+		int[] procs = CpuInfo.getIsolcpusProcIds("isolcpus=0-15:2/4");
+
+		Assert.assertArrayEquals(new int[] { 0, 1, 4, 5, 8, 9, 12, 13 }, procs);
+	}
+
 	@Test
 	public void testBitmasks() {
 		
